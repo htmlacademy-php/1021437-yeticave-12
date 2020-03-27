@@ -65,13 +65,13 @@ $ads_main_page = [
         <a class="main-header__add-lot button" href="pages/add-lot.html">Добавить лот</a>
 
         <nav class="user-menu">
-            <?php if ($is_auth === 1): ?>
+            <?php if ($is_auth === 1) : ?>
             <div class="user-menu__logged">
                 <p><?=$user_name;?></p>
                 <a class="user-menu__bets" href="pages/my-bets.html">Мои ставки</a>
                 <a class="user-menu__logout" href="#">Выход</a>
             </div>
-            <?php else: ?>
+            <?php else : ?>
             <ul class="user-menu__list">
                 <li class="user-menu__item">
                     <a href="#">Регистрация</a>
@@ -88,13 +88,15 @@ $ads_main_page = [
 <main class="container">
     <section class="promo">
         <h2 class="promo__title">Нужен стафф для катки?</h2>
-        <p class="promo__text">На нашем интернет-аукционе ты найдёшь самое эксклюзивное сноубордическое и горнолыжное снаряжение.</p>
+        <p class="promo__text">
+            На нашем интернет-аукционе ты найдёшь самое эксклюзивное сноубордическое и горнолыжное снаряжение.
+        </p>
         <ul class="promo__list">
-            <?php foreach ($categories as $category):?>
+            <?php foreach ($categories as $category) : ?>
             <li class="promo__item promo__item--boards">
                 <a class="promo__link" href="pages/all-lots.html"><?=$category;?></a>
             </li>
-            <?php endforeach;?>
+            <?php endforeach ; ?>
         </ul>
     </section>
     <section class="lots">
@@ -102,7 +104,7 @@ $ads_main_page = [
             <h2>Открытые лоты</h2>
         </div>
         <ul class="lots__list">
-            <?php foreach ($ads_main_page as $lot): ?>
+            <?php foreach ($ads_main_page as $lot) : ?>
             <li class="lots__item lot">
                 <div class="lot__image">
                     <img src="<?=$lot['url_image'];?>" width="350" height="260" alt="">
@@ -130,11 +132,11 @@ $ads_main_page = [
 <footer class="main-footer">
     <nav class="nav">
         <ul class="nav__list container">
-           <?php foreach ($categories as $category):?>
+            <?php foreach ($categories as $category) : ?>
             <li class="nav__item">
                 <a href="pages/all-lots.html"><?=$category?></a>
             </li>
-            <?php endforeach;?>
+            <?php endforeach ; ?>
         </ul>
     </nav>
     <div class="main-footer__bottom container">
