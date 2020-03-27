@@ -2,12 +2,8 @@
 function format_sum($number = 0)
 {
     $price = ceil($number);
-    $format_price = null;
-    if ($price >= 1000) {
-        $format_price = number_format($price, 0, ',', ' ');
-        return $format_price .  " ₽";
-    }
-    return $price .  " ₽";
+    $format_price = number_format($price, 0, ',', ' ');
+    return $format_price .  " ₽";
 }
 $is_auth = rand(0, 1);
 $user_name = 'Bogdan'; // укажите здесь ваше имя
