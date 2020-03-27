@@ -1,16 +1,13 @@
 <?php
 function format_sum($number = 0)
 {
-    $price = 0;
-    if (is_integer(intval($number))) {
-        $price = ceil($number);
-        $format_price = null;
-        if ($price >= 1000) {
-            $format_price = number_format($price, 0, ',', ' ');
-        }
+    $price = ceil($number);
+    $format_price = null;
+    if ($price >= 1000) {
+        $format_price = number_format($price, 0, ',', ' ');
         return $format_price .  " ₽";
     }
-    return $price.  " ₽";
+    return $price .  " ₽";
 }
 $is_auth = rand(0, 1);
 $user_name = 'Bogdan'; // укажите здесь ваше имя
@@ -128,7 +125,7 @@ $ads_main_page = [
                     <div class="lot__state">
                         <div class="lot__rate">
                             <span class="lot__amount">Стартовая цена</span>
-                            <span class="lot__cost"><?php echo format_sum($lot['price']); ?></span>
+                            <span class="lot__cost"><?= format_sum($lot['price']); ?></span>
                         </div>
                         <div class="lot__timer timer">
                             12:23
