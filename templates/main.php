@@ -46,10 +46,12 @@ function get_dt_range($value_date)
                             <span class="lot__amount">Стартовая цена</span>
                             <span class="lot__cost"><?= format_sum($lot['price']); ?></span>
                         </div>
-                        <div class="lot__timer timer <?php if (get_dt_range($lot['expiration_date'])[0] < 1) : ?>timer--finishing<?php endif;?>">
+                        <?php
+                            list($hours, $minutes) = get_dt_range($lot['expiration_date']);
+                        ?>
+                        <div class="lot__timer timer <?php if ($hours < 1) : ?>timer--finishing<?php endif;?>">
                             <?php
-                                $my_date = get_dt_range($lot['expiration_date']);
-                                echo $my_date[0] . ":" . $my_date[1];
+                                echo $hours . ":" . $minutes;
                             ?>
                         </div>
                     </div>
