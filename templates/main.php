@@ -5,6 +5,13 @@ function format_sum($number = 0)
     $format_price = number_format($price, 0, ',', ' ');
     return $format_price .  " ₽";
 }
+function get_dt_range($value_date)
+{
+    $time_difference = strtotime($value_date) - time();
+    $time_hours = floor($time_difference / 3600);
+    $time_minutes = floor(($time_difference % 3600) / 60);
+    return [$time_hours, $time_minutes];
+}
 ?>
 <section class="promo">
     <h2 class="promo__title">Нужен стафф для катки?</h2>
@@ -38,8 +45,13 @@ function format_sum($number = 0)
                             <span class="lot__amount">Стартовая цена</span>
                             <span class="lot__cost"><?= format_sum($lot['price']); ?></span>
                         </div>
-                        <div class="lot__timer timer">
-                            12:23
+                        <?php
+                            list($hours, $minutes) = get_dt_range($lot['expiration_date']);
+                        ?>
+                        <div class="lot__timer timer <?php if ($hours < 1) : ?>timer--finishing<?php endif;?>">
+                            <?php
+                                echo $hours . ":" . $minutes;
+                            ?>
                         </div>
                     </div>
                 </div>
