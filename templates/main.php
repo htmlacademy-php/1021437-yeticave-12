@@ -7,10 +7,9 @@ function format_sum($number = 0)
 }
 function get_dt_range($value_date)
 {
-    $time_end = strtotime($value_date);
-    $time_now = time();
-    $time_hours = floor(($time_end - $time_now) / 3600);
-    $time_minutes = floor((($time_end - $time_now) % 3600) / 60);
+    $time_difference = strtotime($value_date) - time();
+    $time_hours = floor($time_difference / 3600);
+    $time_minutes = floor(($time_difference % 3600) / 60);
     return [$time_hours, $time_minutes];
 }
 ?>
