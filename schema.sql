@@ -17,8 +17,8 @@ CREATE TABLE `users` (
 -- Создание таблицы с категориями
 CREATE TABLE `categories` (
      `id` INT AUTO_INCREMENT PRIMARY KEY,
-     `name` VARCHAR(30) NOT NULL UNIQUE,
-     `code` VARCHAR(20) NOT NUll
+     `name` VARCHAR(255) NOT NULL UNIQUE,
+     `code` VARCHAR(255) NOT NUll
 );
 
 -- Создание таблицы с лотами
@@ -28,9 +28,9 @@ CREATE TABLE `lots` (
     `name` VARCHAR(255) NOT NULL COMMENT 'наименование лота',
     `description` TEXT COMMENT 'описание лота',
     `image_link` VARCHAR(2048) NOT NULL COMMENT 'ссылка на изображение',
-    `price_start` INT UNSIGNED NOT NULL COMMENT 'начальная цена',
-    `date_end` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'дата и время конца лота',
-    `step_rate` INT UNSIGNED NOT NULL COMMENT 'шаг ставки',
+    `price_start` DECIMAL(16,2) UNSIGNED NOT NULL COMMENT 'начальная цена',
+    `ends_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'дата и время конца лота',
+    `step_rate` DECIMAL(16,2) UNSIGNED NOT NULL COMMENT 'шаг ставки',
     `author_id` INT NOT NULL COMMENT 'id пользователя',
     `user_winner_id` INT NOT NULL COMMENT 'id победителя',
     `category_id` INT NOT NULL COMMENT 'id категории объявления'
@@ -43,7 +43,7 @@ CREATE INDEX user_category ON lots(author_id, category_id);
 CREATE TABLE `bids` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'дата и время размешения ставки',
-    `price` INT UNSIGNED NOT NULL COMMENT 'цена ставки',
+    `price` DECIMAL(16,2) UNSIGNED NOT NULL COMMENT 'цена ставки',
     `user_id` INT NOT NULL COMMENT 'id пользователя',
     `lot_id` INT NOT NULL COMMENT 'id лота'
 );
