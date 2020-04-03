@@ -35,13 +35,13 @@ VALUES
 INSERT INTO `bids`
     (`created_at`, `price`, `user_id`, `lot_id`)
 VALUES
-(NOW(), '8300', '3', '3'),
-(NOW(), '8600', '4', '3'),
-(NOW(), '8900', '5', '3'),
-(NOW(), '161999', '4', '2'),
-(NOW(), '11699', '2', '4'),
-(NOW(), '9200', '4', '3'),
-(NOW(), '12399', '3', '4');
+(NOW() - INTERVAL 1 DAY, '8300', '3', '3'),
+(NOW() - INTERVAL 1 HOUR, '8600', '4', '3'),
+(NOW() - INTERVAL 2 DAY, '8900', '5', '3'),
+(NOW() - INTERVAL 7 HOUR, '161999', '4', '2'),
+(NOW() - INTERVAL '01T00:00:15' DAY_SECOND, '11699', '2', '4'),
+(NOW() - INTERVAL 4 HOUR, '9200', '4', '3'),
+(NOW() - INTERVAL 13 HOUR, '12399', '3', '4');
 
 -- получить все категории
 SELECT `name` FROM `categories`;
