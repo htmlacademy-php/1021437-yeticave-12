@@ -32,7 +32,7 @@ function get_dt_range($value_date)
     </div>
     <ul class="lots__list">
         <?php
-        foreach ($ads as $lot) : ?>
+        foreach ($lots as $lot) : ?>
             <li class="lots__item lot">
                 <div class="lot__image">
                     <img src="<?=htmlspecialchars($lot['image_link']);?>" width="350" height="260" alt="">
