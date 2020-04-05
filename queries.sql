@@ -23,12 +23,12 @@ VALUES
 INSERT INTO `lots`
     (`created_at`, `name`, `description`, `image_link`, `price_start`, `ends_at`, `step_rate`, `author_id`, `user_winner_id`, `category_id`)
 VALUES
-(NOW(), '2014 Rossignol District Snowboard', 'Легкая, быстрая, стабильная, отлично выстреливающая вверх', 'img/lot-1.jpg', '10999', '2020-04-12 23:00:00', '100', '2', '4', '1'),
-(NOW(), 'DC Ply Mens 2016/2017 Snowboard', 'Максимально заряженная на быстрое и агрессивное катания', 'img/lot-2.jpg', '159999', '2020-04-10 23:00:00', '2000', '4', '2', '1'),
-(NOW(), 'Крепления Union Contact Pro 2015 года размер L/XL', 'Отличная модель от известного брэнда, который специализируется на креплениях', 'img/lot-3.jpg', '8000', '2020-04-11 23:00:00', '300', '2', '2', '2'),
-(NOW(), 'Ботинки для сноуборда DC Mutiny Charocal', 'Удобный, технологичный и стильный вариант', 'img/lot-4.jpg', '10999', '2020-04-09 23:00:00', '700', '3', '3', '3'),
-(NOW(), 'Куртка для сноуборда DC Mutiny Charocal', 'Стильный силуэт подчеркнет Ваш городской образ.', 'img/lot-5.jpg', '7500', '2020-04-13 23:00:00', '250', '5', '5', '4'),
-(NOW(), 'Маска Oakley Canopy', 'Такая маска идеально подойдет опытным райдерам', 'img/lot-6.jpg', '5400', '2020-04-14 23:00:00', '400', '2', '4', '6');
+(NOW() - INTERVAL 1 DAY, '2014 Rossignol District Snowboard', 'Легкая, быстрая, стабильная, отлично выстреливающая вверх', 'img/lot-1.jpg', '10999', '2020-04-12 23:00:00', '100', '2', '4', '1'),
+(NOW() - INTERVAL 1 HOUR, 'DC Ply Mens 2016/2017 Snowboard', 'Максимально заряженная на быстрое и агрессивное катания', 'img/lot-2.jpg', '159999', '2020-04-10 23:00:00', '2000', '4', '2', '1'),
+(NOW() - INTERVAL 2 DAY, 'Крепления Union Contact Pro 2015 года размер L/XL', 'Отличная модель от известного брэнда, который специализируется на креплениях', 'img/lot-3.jpg', '8000', '2020-04-11 23:00:00', '300', '2', '2', '2'),
+(NOW() - INTERVAL 7 HOUR, 'Ботинки для сноуборда DC Mutiny Charocal', 'Удобный, технологичный и стильный вариант', 'img/lot-4.jpg', '10999', '2020-04-09 23:00:00', '700', '3', '3', '3'),
+(NOW()  - INTERVAL 4 HOUR, 'Куртка для сноуборда DC Mutiny Charocal', 'Стильный силуэт подчеркнет Ваш городской образ.', 'img/lot-5.jpg', '7500', '2020-04-13 23:00:00', '250', '5', '5', '4'),
+(NOW() - INTERVAL 13 HOUR, 'Маска Oakley Canopy', 'Такая маска идеально подойдет опытным райдерам', 'img/lot-6.jpg', '5400', '2020-04-14 23:00:00', '400', '2', '4', '6');
 
 
 -- Добавление ставок
@@ -47,7 +47,7 @@ VALUES
 SELECT `name` FROM `categories`;
 
 -- получить самые новые, открытые лоты. Каждый лот должен включать название, стартовую цену, ссылку на изображение, текущую цену, название категории
-SELECT lot.name, lot.price_start, lot.image_link, category.name, bid.price as current_price FROM `lots` as lot
+SELECT lot.name, lot.price_start, lot.image_link, category.name as category_name, bid.price as current_price FROM `lots` as lot
     INNER JOIN `categories` as category ON category.id = lot.category_id
     INNER JOIN `bids` as bid ON bid.lot_id = lot.id
     WHERE lot.ends_at > NOW() ORDER BY lot.created_at;
