@@ -1,17 +1,5 @@
 <?php
-function format_sum($number = 0)
-{
-    $price = ceil($number);
-    $format_price = number_format($price, 0, ',', ' ');
-    return $format_price .  " ₽";
-}
-function get_dt_range($value_date)
-{
-    $time_difference = strtotime($value_date) - time();
-    $time_hours = floor($time_difference / 3600);
-    $time_minutes = floor(($time_difference % 3600) / 60);
-    return [$time_hours, $time_minutes];
-}
+require_once 'functions.php';
 ?>
 <section class="promo">
     <h2 class="promo__title">Нужен стафф для катки?</h2>
@@ -39,7 +27,7 @@ function get_dt_range($value_date)
                 </div>
                 <div class="lot__info">
                     <span class="lot__category"><?=htmlspecialchars($lot['category_name'])?></span>
-                    <h3 class="lot__title"><a class="text-link" href="pages/lot.html"><?=htmlspecialchars($lot['name'])?></a></h3>
+                    <h3 class="lot__title"><a class="text-link" href="lot.php?id=<?=htmlspecialchars($lot['id']);?>"><?=htmlspecialchars($lot['name'])?></a></h3>
                     <div class="lot__state">
                         <div class="lot__rate">
                             <span class="lot__amount">Стартовая цена</span>

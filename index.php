@@ -17,7 +17,7 @@ $result_categories = mysqli_query($con, $sql_categories);
 $categories = mysqli_fetch_all($result_categories, MYSQLI_ASSOC);
 
 // запрос лотов
-$sql_lots = "SELECT lot.name, lot.price_start, lot.image_link, lot.created_at, lot.ends_at, category.name as category_name FROM `lots` as lot
+$sql_lots = "SELECT lot.id, lot.name, lot.price_start, lot.image_link, lot.created_at, lot.ends_at, category.name as category_name FROM `lots` as lot
 INNER JOIN `categories` as category
 ON lot.category_id = category.id
 WHERE lot.ends_at > NOW()
