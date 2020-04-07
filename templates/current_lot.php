@@ -26,7 +26,7 @@ require_once 'functions.php';
                 <div class="lot-item__cost-state">
                     <div class="lot-item__rate">
                         <span class="lot-item__amount">Текущая цена</span>
-                        <span class="lot-item__cost"><?= format_sum(get_max_price_bids($bids));?></span>
+                        <span class="lot-item__cost"><?= format_sum(get_max_price_bids($bids, $lot['price_start']))?></span>
                     </div>
                     <div class="lot-item__min-cost">
                         Мин. ставка <span><?=format_sum($lot['step_rate'])?></span>

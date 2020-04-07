@@ -12,13 +12,16 @@ function get_dt_range($value_date)
     $time_minutes = floor(($time_difference % 3600) / 60);
     return [$time_hours, $time_minutes];
 }
-function get_max_price_bids($prices)
+function get_max_price_bids($prices, $price_start)
 {
-    $max_value = $prices[0]['price'];
-    foreach ($prices as $price) {
-        if ($max_value < $price['price']) {
-            $max_value = $price['price'];
+    if (isset($prices[0]['price'])) {
+        $max_value = $prices[0]['price'];
+        foreach ($prices as $price) {
+            if ($max_value < $price['price']) {
+                $max_value = $price['price'];
+            }
         }
+        return $max_value;
     }
-    return $max_value;
+    return $price_start;
 }
