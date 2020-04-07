@@ -14,14 +14,14 @@ function get_dt_range($value_date)
 }
 function get_max_price_bids($prices, $price_start)
 {
-    if (isset($prices[0]['price'])) {
-        $max_value = $prices[0]['price'];
-        foreach ($prices as $price) {
-            if ($max_value < $price['price']) {
-                $max_value = $price['price'];
-            }
-        }
-        return $max_value;
+    if (!isset($prices[0]['price'])) {
+        return $price_start;
     }
-    return $price_start;
+    $max_value = $prices[0]['price'];
+    foreach ($prices as $price) {
+        if ($max_value < $price['price']) {
+            $max_value = $price['price'];
+        }
+    }
+    return $max_value;
 }
