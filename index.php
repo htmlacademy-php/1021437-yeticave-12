@@ -2,8 +2,6 @@
 date_default_timezone_set("Europe/Moscow");
 require_once "helpers.php";
 require_once "mysql_connect.php";
-// установка кодировки
-mysqli_set_charset($con, "utf8");
 // запрос категорий
 $sql_categories = "SELECT `name`, `code` FROM `categories`";
 // выполнение запроса
