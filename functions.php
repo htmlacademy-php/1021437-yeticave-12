@@ -25,14 +25,9 @@ function get_max_price_bids($prices, $price_start)
     }
     return $max_value;
 }
-function get_id_category($categories)
+function check_field($field)
 {
-    $id_category = NULL;
-    foreach ($categories as $item) {
-        if ($item['name'] === $_POST['category']) {
-            $id_category = $item['id'];
-        }
+    if (empty($field)) {
+        return "Это поле обязательно к заполнению";
     }
-    // если категорию не получилось опрелелить пусть лот попадает в категорию разное
-    return $id_category ?? 6;
 }

@@ -1,8 +1,8 @@
 <?php
 date_default_timezone_set("Europe/Moscow");
+require_once "mysql_connect.php";
 require_once "helpers.php";
 require_once "functions.php";
-require_once "mysql_connect.php";
 
 // запрос категорий
 $sql_categories = "SELECT `name`, `code`, `id` FROM `categories`";
@@ -17,40 +17,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $errors = [];
 
     // функция проверки полей: lot-name, message
-    function validate_field_text($field_text, $type, $max = NULL)
+    function validate_field_text($field_text, $max = NULL)
     {
-        if(empty($field_text)) {
-            return "Это поле обязательно к заполнению";
+        if($max) {
+            if(mb_strlen($field_text) > $max) {
+                return "Значение должно быть не более $max символов";
+            }
         }
-        //поле lot-name имеет ограничение из-за типа Varchar(255)
-        if($type === 'lot-name' && strlen($field_text) > $max) {
-            return "Значение должно быть от $min до $max символов";
-        }
+        return check_field($field_text);
     }
-    // функция проверки начальной цены
+    // функция проверки начальной цены и шага ставки
     function validate_field_price($field_price)
     {
-        if(empty($field_price)) {
-            return "Поле сумма обязательно к заполнению";
+        if(!is_numeric($field_price)) {
+            return "Можно вводить только число";
         }
-        $price = number_format(intval($field_price), 0, '.', ',');
+        $price = number_format($field_price, 2, '.', ',');
         if ($price <= 0) {
             return "Введите число больше нуля";
         }
+        return check_field($field_price);
     }
     // функция проверки выбора категории
     function validate_field_category($field_category)
     {
-        if($field_category === 'Выберите категорию') {
-            return "Выберите категорию из списка";
-        }
+        return check_field($field_category);
     }
     // функция проверки даты
     function validate_field_date($field_date)
     {
-        if(empty($field_date)) {
-            return "Поле дата обязательно к заполнению";
-        }
+        return check_field($field_date);
         $format_to_check = 'Y-m-d';
         $dateTimeObj = date_create_from_format($format_to_check, $field_date);
         if ($dateTimeObj) {
@@ -63,10 +59,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //правила проверок
     $rules = [
         'lot-name' => function() {
-            return validate_field_text($_POST['lot-name'],  'lot-name', 255);
+            return validate_field_text($_POST['lot-name'],  255);
         },
         'message' => function() {
-            return validate_field_text($_POST['message'],  'message');
+            return validate_field_text($_POST['message']);
         },
         'lot-rate' => function() {
             return validate_field_price($_POST['lot-rate']);
@@ -98,21 +94,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $type_file = mime_content_type($_FILES['lot-img']['tmp_name']);
         if($type_file !== "image/jpeg" && $type_file !== "image/png") {
             $errors['lot-img'] = 'Поддерживается загрузка только png, jpg, jpeg ' . $type_file;
+        } else {
+            move_uploaded_file($_FILES['lot-img']['tmp_name'], PATH_UPLOADS_IMAGE .$file_name);
         }
-        move_uploaded_file($_FILES['lot-img']['tmp_name'], 'img/'.$file_name);
+
     }
 
 
     //если ошибок нету
     if(!count($errors)) {
-        $file_url = 'img/' . $_FILES['lot-img']['name'];
-        $id_category = get_id_category($categories);
+        $file_url = PATH_UPLOADS_IMAGE . $_FILES['lot-img']['name'];
         $query_insert_database_lot = "INSERT INTO `lots`
     (`created_at`, `name`, `description`, `image_link`, `price_start`, `ends_at`, `step_rate`, `author_id`, `user_winner_id`, `category_id`)
 VALUES
 (NOW(), ?, ?, ?, ?, ?, ?, '3', '0', ?)";
         $stmt = mysqli_prepare($con, $query_insert_database_lot);
-        mysqli_stmt_bind_param($stmt, 'sssisii', $_POST['lot-name'],$_POST['message'], $file_url, $_POST['lot-rate'], $_POST['lot-date'], $_POST['lot-step'], $id_category);
+        mysqli_stmt_bind_param($stmt, 'ssssssi', $_POST['lot-name'],$_POST['message'], $file_url, $_POST['lot-rate'], $_POST['lot-date'], $_POST['lot-step'], $_POST['category']);
         $result = mysqli_stmt_execute($stmt);
 
         if ($result) {
