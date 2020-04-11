@@ -1,6 +1,3 @@
-<?php
-$is_auth = rand(0, 1);
-?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -8,6 +5,7 @@ $is_auth = rand(0, 1);
     <title><?=$title_page;?></title>
     <link href="css/normalize.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <?= $link_calender =  $css_calendar ?? ''; ?>
 </head>
 <body>
 <div class="page-wrapper">
@@ -22,7 +20,9 @@ $is_auth = rand(0, 1);
                 <input type="search" name="search" placeholder="Поиск лота">
                 <input class="main-header__search-btn" type="submit" name="find" value="Найти">
             </form>
-            <a class="main-header__add-lot button" href="pages/add-lot.html">Добавить лот</a>
+            <?php if ($is_auth === 1) : ?>
+            <a class="main-header__add-lot button" href="add.php">Добавить лот</a>
+            <?php endif;?>
 
             <nav class="user-menu">
                 <?php if ($is_auth === 1) : ?>

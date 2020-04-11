@@ -2,6 +2,7 @@
 date_default_timezone_set("Europe/Moscow");
 require_once "helpers.php";
 require_once "mysql_connect.php";
+require_once "functions.php";
 
 // запрос категорий
 $sql_categories = "SELECT `name`, `code` FROM `categories`";
@@ -55,7 +56,8 @@ $layout_content = include_template("layout.php", [
     'main_content' => $page_content,
     'title_page' => 'Карточка лота',
     'user_name' => 'Bogdan',
-    'categories' => $categories
+    'categories' => $categories,
+    'is_auth' => $is_auth,
 ]);
 
 print($layout_content);

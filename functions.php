@@ -25,3 +25,11 @@ function get_max_price_bids($prices, $price_start)
     }
     return $max_value;
 }
+function check_field($field)
+{
+    if (empty($field)) {
+        return "Это поле обязательно к заполнению";
+    }
+}
+// состояние пользователя
+$is_auth = rand(0, 1);

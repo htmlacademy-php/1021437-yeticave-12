@@ -2,8 +2,7 @@
 date_default_timezone_set("Europe/Moscow");
 require_once "helpers.php";
 require_once "mysql_connect.php";
-// установка кодировки
-mysqli_set_charset($con, "utf8");
+require_once "functions.php";
 // запрос категорий
 $sql_categories = "SELECT `name`, `code` FROM `categories`";
 // выполнение запроса
@@ -32,6 +31,7 @@ $layout_content = include_template("layout.php", [
     'title_page' => 'Главная',
     'user_name' => 'Bogdan',
     'categories' => $categories,
+    'is_auth' => $is_auth,
 ]);
 
 print($layout_content);
