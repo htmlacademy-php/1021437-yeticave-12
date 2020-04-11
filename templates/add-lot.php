@@ -27,7 +27,7 @@ $classname_field_image = isset($errors['lot-img']) ? 'form__item--invalid' : '';
             <select id="category" name="category">
                 <option value="">Выберите категорию</option>
                 <?php foreach ($categories as $category) : ?>
-                    <option value="<?= $category['id'];?>" <?php if($category['id'] === $_POST['category']) : ?>selected<?endif;?>><?= $category['name'];?></option>
+                    <option value="<?= $category['id'];?>" <?php if ($category['id'] === $_POST['category']) : ?>selected<?endif;?>><?= $category['name'];?></option>
                 <?php endforeach; ?>
             </select>
             <span class="form__error"><?=$errors['category'] ?? '';?></span>
