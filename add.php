@@ -1,8 +1,13 @@
 <?php
+
 date_default_timezone_set("Europe/Moscow");
 require_once "mysql_connect.php";
 require_once "helpers.php";
 require_once "functions.php";
+
+if ($is_auth === 0) {
+    header("Location: index.php");
+}
 
 // запрос категорий
 $sql_categories = "SELECT `name`, `code`, `id` FROM `categories`";
@@ -135,7 +140,8 @@ $layout_content = include_template("layout.php", [
     'title_page' => 'Добавление лота',
     'user_name' => 'Bogdan',
     'categories' => $categories,
-    'css_calendar' => "<link href=\"css/flatpickr.min.css\" rel=\"stylesheet\">"
+    'css_calendar' => "<link href=\"css/flatpickr.min.css\" rel=\"stylesheet\">",
+    'is_auth' => $is_auth,
 ]);
 
 print($layout_content);

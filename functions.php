@@ -31,3 +31,5 @@ function check_field($field)
         return "Это поле обязательно к заполнению";
     }
 }
+// состояние пользователя
+$is_auth = rand(0, 1);
