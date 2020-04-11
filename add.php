@@ -19,10 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // функция проверки полей: lot-name, message
     function validate_field_text($field_text, $max = NULL)
     {
-        if($max) {
-            if(mb_strlen($field_text) > $max) {
-                return "Значение должно быть не более $max символов";
-            }
+        if($max && mb_strlen($field_text) > $max) {
+            return "Значение должно быть не более $max символов";
         }
         return check_field($field_text);
     }
@@ -46,15 +44,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // функция проверки даты
     function validate_field_date($field_date)
     {
-        return check_field($field_date);
         $format_to_check = 'Y-m-d';
         $dateTimeObj = date_create_from_format($format_to_check, $field_date);
         if ($dateTimeObj) {
             $diff_in_hours = floor((strtotime($field_date) - strtotime("now")) / 3600);
             if ($diff_in_hours <= 24) {
-                return "Дата заверешния торгов, не может быть меньше 24 часов или отрицательной" . $diff_in_hours;
+                return "Дата заверешния торгов, не может быть меньше 24 часов или отрицательной";
             }
         }
+        return check_field($field_date);
     }
     //правила проверок
     $rules = [
