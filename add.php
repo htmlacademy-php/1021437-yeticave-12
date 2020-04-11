@@ -4,7 +4,6 @@ date_default_timezone_set("Europe/Moscow");
 require_once "mysql_connect.php";
 require_once "helpers.php";
 require_once "functions.php";
-
 if ($is_auth === 0) {
     header("Location: index.php");
 }
@@ -93,12 +92,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($_FILES['lot-img']['name'])) {
         $errors['lot-img'] = 'Файл обязателен для загрузки';
     } else {
-        $file_name = $_FILES['lot-img']['name'];
+        $id_image = uniqid();
+        $file_name = $id_image . $_FILES['lot-img']['name'];
         $type_file = mime_content_type($_FILES['lot-img']['tmp_name']);
         if($type_file !== "image/jpeg" && $type_file !== "image/png") {
             $errors['lot-img'] = 'Поддерживается загрузка только png, jpg, jpeg ' . $type_file;
         } else {
             move_uploaded_file($_FILES['lot-img']['tmp_name'], PATH_UPLOADS_IMAGE .$file_name);
+            if($_FILES['lot-img']['error'] !== UPLOAD_ERR_OK) {
+                return "Ошибка при загрузке файла - код ошибки: " . $_FILES['lot-img']['error'];
+            }
         }
 
     }
@@ -106,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //если ошибок нету
     if(!count($errors)) {
-        $file_url = PATH_UPLOADS_IMAGE . $_FILES['lot-img']['name'];
+        $file_url = PATH_UPLOADS_IMAGE . $id_image . $_FILES['lot-img']['name'];
         $query_insert_database_lot = "INSERT INTO `lots`
     (`created_at`, `name`, `description`, `image_link`, `price_start`, `ends_at`, `step_rate`, `author_id`, `user_winner_id`, `category_id`)
 VALUES

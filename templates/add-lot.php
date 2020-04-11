@@ -13,6 +13,7 @@ $classname_field_price = isset($errors['lot-rate']) ? 'form__item--invalid' : ''
 $classname_field_step_price = isset($errors['lot-step']) ? 'form__item--invalid' : '';
 $classname_field_date = isset($errors['lot-date']) ? 'form__item--invalid' : '';
 $classname_field_image = isset($errors['lot-img']) ? 'form__item--invalid' : '';
+$id_category = isset($_POST['category']) ? $_POST['category'] : '';
 ?>
 <form class="form form--add-lot container <?php if (count($errors)) : ?>form--invalid<?endif;?>" action="add.php" method="POST" enctype="multipart/form-data">
     <h2>Добавление лота</h2>
@@ -27,7 +28,7 @@ $classname_field_image = isset($errors['lot-img']) ? 'form__item--invalid' : '';
             <select id="category" name="category">
                 <option value="">Выберите категорию</option>
                 <?php foreach ($categories as $category) : ?>
-                    <option value="<?= $category['id'];?>" <?php if ($category['id'] === $_POST['category']) : ?>selected<?endif;?>><?= $category['name'];?></option>
+                    <option value="<?= $category['id'];?>" <?php if ($category['id'] === $id_category) : ?>selected<?endif;?>><?= $category['name'];?></option>
                 <?php endforeach; ?>
             </select>
             <span class="form__error"><?=$errors['category'] ?? '';?></span>
