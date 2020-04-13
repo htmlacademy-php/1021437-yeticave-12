@@ -1,11 +1,8 @@
 <?php
 date_default_timezone_set("Europe/Moscow");
 require_once "mysql_connect.php";
-// блок проверок валидации формы добавление лота
-function get_field_value($field_name)
-{
-    return $_POST[$field_name] ?? "";
-}
+require_once "functions.php";
+
 $classname_field_name = isset($errors['lot-name']) ? 'form__item--invalid' : '';
 $classname_field_category = isset($errors['category']) ? 'form__item--invalid' : '';
 $classname_field_message = isset($errors['message']) ? 'form__item--invalid' : '';
