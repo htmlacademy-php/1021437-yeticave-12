@@ -87,11 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-//    function handler_rules($data, $rules)
-//    {
-//
-//    }
-
     $errors = array_filter($errors);
 
     if (empty($_FILES['lot-img']['name'])) {

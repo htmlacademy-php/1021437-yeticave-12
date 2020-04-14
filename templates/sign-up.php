@@ -3,12 +3,11 @@ date_default_timezone_set("Europe/Moscow");
 require_once "functions.php";
 ?>
 
-
-<form class="form container <?if(!empty($errors)) : ?>form--invalid<?endif;?>" action="authorization.php" method="POST" autocomplete="off">
+<form class="form container <?if(!empty($errors)) : ?>form--invalid<?endif;?>" action="registration.php" method="POST" autocomplete="off">
     <h2>Регистрация нового аккаунта</h2>
     <div class="form__item <?if(!empty($errors['email'])) : ?> form__item--invalid <?endif;?>">
         <label for="email">E-mail <sup>*</sup></label>
-        <input id="email" type="text" name="email" placeholder="Введите e-mail" value="<?= htmlspecialchars(get_field_value('email'))?>">
+        <input id="email" type="email" name="email" placeholder="Введите e-mail" value="<?= htmlspecialchars(get_field_value('email'))?>">
         <span class="form__error"><?= ($errors['email']) ?? ''?></span>
     </div>
     <div class="form__item <?if(!empty($errors['password'])) : ?> form__item--invalid <?endif;?>"">

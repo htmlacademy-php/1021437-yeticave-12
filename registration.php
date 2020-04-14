@@ -8,28 +8,30 @@ if ($is_auth === 1) {
     header("Location: index.php");
 }
 
-// запрос категорий
-$sql_categories = "SELECT `name`, `code`, `id` FROM `categories`";
-// выполнение запроса
-$result_categories = mysqli_query($con, $sql_categories);
-// получение двухмерного массива категорий
-$categories = mysqli_fetch_all($result_categories, MYSQLI_ASSOC);
-
+// если метод отправки формы POST то обрабатываем его
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $required_fields = ['email', 'password', 'name', 'message'];
     $errors = [];
 
-    function validate_field_email($email_field)
+    function validate_field_email($email_field, $link)
     {
         if(!filter_var($email_field, FILTER_VALIDATE_EMAIL)) {
             return "Невалидный адрес";
+        }
+        $email = mysqli_real_escape_string($link, $email_field);
+        $sql_query_empty_user = "SELECT `id` FROM users WHERE `email` = ?";
+        $stmt = db_get_prepare_stmt($link, $sql_query_empty_user, [$email]);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        if (mysqli_num_rows($result) > 0) {
+            return "Пользователь с этим email уже зарегистрирован";
         }
         return check_field($email_field);
     }
 
     $rules = [
-        'email' => function() {
-            return validate_field_email($_POST['email']);
+        'email' => function() use ($con) {
+            return validate_field_email($_POST['email'], $con);
         },
         'password' => function() {
             return check_field($_POST['password']);
@@ -52,21 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $errors = array_filter($errors);
 
-    $email = mysqli_real_escape_string($con, $_POST['email']);
-    $sql = "SELECT `id` FROM users WHERE `email` = '$email'";
-    $res = mysqli_query($con, $sql);
-    if (mysqli_num_rows($res) > 0) {
-        $errors['email'] = 'Пользователь с этим email уже зарегистрирован';
-    }
+
 
     if(empty($errors)) {
-        //шифруем пароль MD5
+        //шифруем пароль
         $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $query_insert_database_user = "INSERT INTO `users` (`registration_at`, `email`, `name`, `password`, `users_info`)
     VALUES
     (NOW(), ?, ?, ?, ?)";
-        $stmt = mysqli_prepare($con, $query_insert_database_user);
-        mysqli_stmt_bind_param($stmt, 'ssss', $_POST['email'], $_POST['name'], $password, $_POST['message']);
+        $stmt = db_get_prepare_stmt($con, $query_insert_database_user, [$_POST['email'], $_POST['name'], $password, $_POST['message']]);
         $result = mysqli_stmt_execute($stmt);
         if($result) {
             header("location: login.php");
@@ -82,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     $page_content = include_template("sign-up.php", []);
 }
-
 
 $layout_content = include_template("layout.php", [
     'main_content' => $page_content,
