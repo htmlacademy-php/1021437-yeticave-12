@@ -33,3 +33,15 @@ function check_field($field)
 }
 // состояние пользователя
 $is_auth = rand(0, 1);
+// блок проверок валидации формы добавление лота
+function get_field_value($field_name)
+{
+    return $_POST[$field_name] ?? "";
+}
+
+// запрос категорий
+$sql_categories = "SELECT `name`, `code`, `id` FROM `categories`";
+// выполнение запроса
+$result_categories = mysqli_query($con, $sql_categories);
+// получение двухмерного массива категорий
+$categories = mysqli_fetch_all($result_categories, MYSQLI_ASSOC);
