@@ -1,4 +1,4 @@
 <section class="lot-item container">
-    <h2><?=$text_error;?></h2>
-    <p>Данной страницы не существует на сайте.</p>
+    <h2>Код ошибки:  <?=$code_error;?></h2>
+    <p><?=$text_error;?></p>
 </section>
