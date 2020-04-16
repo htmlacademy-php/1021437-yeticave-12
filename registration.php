@@ -70,7 +70,7 @@ VALUES
 $layout_content = include_template("layout.php", [
     "main_content" => $page_content,
     "title_page" => "Страница регистрации",
-    "user_name" => $_SESSION["user"]["name"],
+    "user_name" => $_SESSION["user"]["name"] ?? '',
     "categories" => $categories,
 ]);
 

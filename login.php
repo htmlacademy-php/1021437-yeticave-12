@@ -2,44 +2,44 @@
 require_once "init.php";
 require_once "helpers.php";
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+if (isset($_SESSION['user'])) {
+    header("Location: index.php");
+    exit();
+} else if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $errors = [];
 
+    function get_data_user($link, $email_field)
+    {
+        $email = mysqli_real_escape_string($link, $email_field);
+        $sql_query_data= "SELECT * FROM `users` WHERE `email` = ? ";
+        $stmt = db_get_prepare_stmt($link, $sql_query_data, [$email]);
+        mysqli_stmt_execute($stmt);
+        return mysqli_stmt_get_result($stmt);
+    }
+
     function validate_email_field($email_field, $link)
     {
-        $is_empty_email = check_field($email_field);
-        if (empty($is_empty_email)) {
-            $email = mysqli_real_escape_string($link, $email_field);
-            $sql_query_user = "SELECT `email` FROM `users` WHERE `email` = ? ";
-            $stmt = db_get_prepare_stmt($link, $sql_query_user, [$email]);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-            if (mysqli_num_rows($result) === 0) {
-                return "Нет пользователя с таким адресом";
-            }
+        if (empty($email_field)) {
+            return "Это поле обязательно к заполнению";
         }
-        return $is_empty_email;
+        $result = get_data_user($link, $email_field);
+        if (mysqli_num_rows($result) === 0) {
+            return "Нет пользователя с таким адресом";
+        }
     }
 
     function validate_password_field($password_field, $email_field, $link)
     {
-        $is_empty_password = check_field($password_field);
-        if(empty($is_empty_password)) {
-            $email = mysqli_real_escape_string($link, $email_field);
-            $sql_query_password = "SELECT * FROM `users` WHERE `email` = ? ";
-            $stmt = db_get_prepare_stmt($link, $sql_query_password, [$email]);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-            $user_data = $result ? mysqli_fetch_assoc($result) : null;
-            if (password_verify($password_field, $user_data["password"])) {
-                //запись в сессию
-                $_SESSION["user"] = $user_data;
-            } else {
-                return "Указан неверный пароль";
-            }
+        if(empty($password_field)) {
+            return "Это поле обязательно к заполнению";
         }
-        return $is_empty_password;
+        $result = get_data_user($link, $email_field);
+        $user_data = $result ? mysqli_fetch_assoc($result) : null;
+        if (!password_verify($password_field, $user_data["password"])) {
+            return "Указан неверный пароль";
+        }
     }
 
     $rules = [
@@ -54,6 +54,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $errors = validation_form($_POST, $rules);
 
     if (empty($errors)) {
+        $result = get_data_user($con, $_POST["email"]);
+        $_SESSION["user"] = $result ? mysqli_fetch_assoc($result) : null;
         header("Location: index.php");
         exit();
     } else {
@@ -62,15 +64,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "text_errors" => "Вы ввели неверный email/пароль",
         ]);
     }
-
 } else {
     $page_content = include_template("login.php", []);
-    if (isset($_SESSION['user'])) {
-        header("Location: index.php");
-        exit();
-    }
 }
-
 
 $layout_content = include_template("layout.php", [
     "main_content" => $page_content,
