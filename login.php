@@ -1,7 +1,6 @@
 <?php
-require_once "mysql_connect.php";
+require_once "init.php";
 require_once "helpers.php";
-require_once "functions.php";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -9,7 +8,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     function validate_email_field($email_field, $link)
     {
-        if(!empty($email_field)) {
+        $is_empty_email = check_field($email_field);
+        if (empty($is_empty_email)) {
             $email = mysqli_real_escape_string($link, $email_field);
             $sql_query_user = "SELECT `email` FROM `users` WHERE `email` = ? ";
             $stmt = db_get_prepare_stmt($link, $sql_query_user, [$email]);
@@ -19,12 +19,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 return "Нет пользователя с таким адресом";
             }
         }
-        return check_field($email_field);
+        return $is_empty_email;
     }
 
     function validate_password_field($password_field, $email_field, $link)
     {
-        if(!empty($password_field)) {
+        $is_empty_password = check_field($password_field);
+        if(empty($is_empty_password)) {
             $email = mysqli_real_escape_string($link, $email_field);
             $sql_query_password = "SELECT * FROM `users` WHERE `email` = ? ";
             $stmt = db_get_prepare_stmt($link, $sql_query_password, [$email]);
@@ -38,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 return "Указан неверный пароль";
             }
         }
-        return check_field($password_field);
+        return $is_empty_password;
     }
 
     $rules = [

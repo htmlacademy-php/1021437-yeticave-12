@@ -1,16 +1,15 @@
 <?php
-date_default_timezone_set("Europe/Moscow");
-require_once "mysql_connect.php";
+require_once "init.php";
 require_once "helpers.php";
-require_once "functions.php";
-$is_auth = 0;
-if ($is_auth === 1) {
-    header("Location: index.php");
-}
 
-// если метод отправки формы POST то обрабатываем его
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
+if (isset($_SESSION["user"])) {
+    http_response_code(403);
+    $page_content = include_template("error.php", [
+        "categories" => $categories,
+        "code_error" => "403",
+        "text_error" => "Страница для незарегистрированных пользователей"
+    ]);
+} else if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $errors = [];
 
     function validate_field_email($email_field, $link)
@@ -49,8 +48,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         //шифруем пароль
         $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
         $query_insert_database_user = "INSERT INTO `users` (`registration_at`, `email`, `name`, `password`, `users_info`)
-    VALUES
-    (NOW(), ?, ?, ?, ?)";
+VALUES
+(NOW(), ?, ?, ?, ?)";
         $stmt = db_get_prepare_stmt($con, $query_insert_database_user, [$_POST["email"], $_POST["name"], $password, $_POST["message"]]);
         $result = mysqli_stmt_execute($stmt);
         if($result) {
@@ -64,13 +63,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "errors" => $errors,
         ]);
     }
-} else if (isset($_SESSION["user"])) {
-    http_response_code(403);
-    $page_content = include_template("error.php", [
-        "categories" => $categories,
-        "code_error" => "403",
-        "text_error" => "Страница для незарегистрированных пользователей"
-    ]);
 } else {
     $page_content = include_template("sign-up.php", []);
 }

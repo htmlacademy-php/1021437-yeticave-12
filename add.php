@@ -1,9 +1,16 @@
 <?php
-require_once "mysql_connect.php";
+require_once "init.php";
 require_once "helpers.php";
-require_once "functions.php";
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+if (!isset($_SESSION["user"])) {
+    http_response_code(403);
+    $page_content = include_template("error.php", [
+        "categories" => $categories,
+        "code_error" => "403",
+        "text_error" => "Страница доступна только зарегистрированным пользователям"
+    ]);
+} else if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $errors = [];
 
@@ -90,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if(!count($errors)) {
         $file_url = PATH_UPLOADS_IMAGE . $id_image . $_FILES["lot-img"]["name"];
         $query_insert_database_lot = "INSERT INTO `lots`
-    (`created_at`, `name`, `description`, `image_link`, `price_start`, `ends_at`, `step_rate`, `author_id`, `user_winner_id`, `category_id`)
+(`created_at`, `name`, `description`, `image_link`, `price_start`, `ends_at`, `step_rate`, `author_id`, `user_winner_id`, `category_id`)
 VALUES
 (NOW(), ?, ?, ?, ?, ?, ?, ?, '0', ?)";
         $stmt = db_get_prepare_stmt($con, $query_insert_database_lot, [$_POST["lot-name"],$_POST["message"], $file_url, $_POST["lot-rate"], $_POST["lot-date"], $_POST["lot-step"], $_SESSION["user"]["id"] ,$_POST["category"]]);
@@ -109,19 +116,12 @@ VALUES
             "errors" => $errors,
         ]);
     }
-} else if (!isset($_SESSION["user"])) {
-    http_response_code(403);
-    $page_content = include_template("error.php", [
-        "categories" => $categories,
-        "code_error" => "403",
-        "text_error" => "Страница доступна только зарегистрированным пользователям"
-    ]);
 } else {
     $page_content = include_template("add-lot.php", [
         "categories" => $categories,
     ]);
-}
 
+}
 
 $layout_content = include_template("layout.php", [
     "main_content" => $page_content,

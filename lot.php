@@ -1,8 +1,6 @@
 <?php
-require_once "mysql_connect.php";
+require_once "init.php";
 require_once "helpers.php";
-require_once "functions.php";
-
 
 // получение идентификатора с помощью фильтра целое число
 $id_lot = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT);

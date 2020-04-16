@@ -51,10 +51,3 @@ function validation_form($data, $rules)
     $errors = array_filter($errors);
     return $errors;
 }
-
-// запрос категорий
-$sql_categories = "SELECT `name`, `code`, `id` FROM `categories`";
-// выполнение запроса
-$result_categories = mysqli_query($con, $sql_categories);
-// получение двухмерного массива категорий
-$categories = mysqli_fetch_all($result_categories, MYSQLI_ASSOC);

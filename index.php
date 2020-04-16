@@ -1,7 +1,6 @@
 <?php
-require_once "mysql_connect.php";
+require_once "init.php";
 require_once "helpers.php";
-require_once "functions.php";
 
 // запрос лотов
 $sql_lots = "SELECT lot.id, lot.name, lot.price_start, lot.image_link, lot.created_at, lot.ends_at, category.name as category_name FROM `lots` as lot
