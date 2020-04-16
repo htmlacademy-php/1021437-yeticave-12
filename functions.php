@@ -2,7 +2,7 @@
 function format_sum($number = 0)
 {
     $price = ceil($number);
-    $format_price = number_format($price, 0, ',', ' ');
+    $format_price = number_format($price, 0, ",", " ");
     return $format_price .  " ₽";
 }
 function get_dt_range($value_date)
@@ -14,13 +14,13 @@ function get_dt_range($value_date)
 }
 function get_max_price_bids($prices, $price_start)
 {
-    if (!isset($prices[0]['price'])) {
+    if (!isset($prices[0]["price"])) {
         return $price_start;
     }
-    $max_value = $prices[0]['price'];
+    $max_value = $prices[0]["price"];
     foreach ($prices as $price) {
-        if ($max_value < $price['price']) {
-            $max_value = $price['price'];
+        if ($max_value < $price["price"]) {
+            $max_value = $price["price"];
         }
     }
     return $max_value;
@@ -31,17 +31,23 @@ function check_field($field)
         return "Это поле обязательно к заполнению";
     }
 }
-// состояние пользователя
-$is_auth = rand(0, 1);
+
 // блок проверок валидации формы добавление лота
 function get_field_value($field_name)
 {
     return $_POST[$field_name] ?? "";
 }
 
-// запрос категорий
-$sql_categories = "SELECT `name`, `code`, `id` FROM `categories`";
-// выполнение запроса
-$result_categories = mysqli_query($con, $sql_categories);
-// получение двухмерного массива категорий
-$categories = mysqli_fetch_all($result_categories, MYSQLI_ASSOC);
+// функция валидация форм
+function validation_form($data, $rules)
+{
+    $errors = [];
+    foreach ($data as $key => $value) {
+        if (isset($rules[$key])) {
+            $rule = $rules[$key];
+            $errors[$key] = $rule();
+        }
+    }
+    $errors = array_filter($errors);
+    return $errors;
+}

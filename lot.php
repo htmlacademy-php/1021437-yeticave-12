@@ -1,19 +1,9 @@
 <?php
-date_default_timezone_set("Europe/Moscow");
+require_once "init.php";
 require_once "helpers.php";
-require_once "mysql_connect.php";
-require_once "functions.php";
-
-// запрос категорий
-$sql_categories = "SELECT `name`, `code` FROM `categories`";
-// выполнение запроса
-$result_categories = mysqli_query($con, $sql_categories);
-// получение двухмерного массива категорий
-$categories = mysqli_fetch_all($result_categories, MYSQLI_ASSOC);
-
 
 // получение идентификатора с помощью фильтра целое число
-$id_lot = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+$id_lot = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT);
 // выборка информации о лоте
 $current_lot = "SELECT lot.id, lot.name, lot.step_rate, ends_at, lot.price_start, lot.description, lot.image_link, lot.created_at, lot.ends_at, category.name as category_name
 FROM `lots` as lot
@@ -34,30 +24,30 @@ if ($result_lot = mysqli_query($con, $current_lot)) {
         $lot = mysqli_fetch_assoc($result_lot);
         // подключаем шаблон с карточкой лота
         $page_content = include_template("current_lot.php", [
-            'categories' => $categories,
-            'lot' => $lot,
-            'bids' => $bids
+            "categories" => $categories,
+            "lot" => $lot,
+            "bids" => $bids,
         ]);
     } else {
         // подключаем шаблон с ошибкой
         $page_content = include_template("error.php", [
-            'text_error' => '404 Страница не найдена'
+            "code_error" => "404",
+            "text_error" => "Не удалось найти страницу с лотом №-" . "<b>" . $id_lot . "</b>",
         ]);
     }
 } else {
     $page_content = include_template("error.php", [
-        'text_error' => "Ошибка подключения: " . mysqli_errno($con)
+        "text_error" => "Ошибка подключения: " . mysqli_errno($con)
     ]);
 }
 
 
 // собираем итоговую страницу лота
 $layout_content = include_template("layout.php", [
-    'main_content' => $page_content,
-    'title_page' => 'Карточка лота',
-    'user_name' => 'Bogdan',
-    'categories' => $categories,
-    'is_auth' => $is_auth,
+    "main_content" => $page_content,
+    "title_page" => "Страница лота",
+    "user_name" => $_SESSION["user"]["name"] ?? "",
+    "categories" => $categories,
 ]);
 
 print($layout_content);
