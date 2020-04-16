@@ -1,5 +1,5 @@
 <?php
-$con = mysqli_connect(HOST_FOR_CONNECT, USER_NAME_CONNECT, USER_PASSWORD_CONNECT, CURRENT_DATABASE);
+$con = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 if ($con === false) {
     print("Ошибка подключения: " . mysqli_connect_error());
     exit();

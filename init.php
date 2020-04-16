@@ -1,11 +1,11 @@
 <?php
 session_start();
 
-define("USER_NAME_CONNECT", "root");
-define("USER_PASSWORD_CONNECT", "9ZOYcLpeEb8y1Zmr");
+define("DB_USER", "root");
+define("DB_PASSWORD", "9ZOYcLpeEb8y1Zmr");
 define("PATH_UPLOADS_IMAGE", "uploads/");
-define("HOST_FOR_CONNECT", "localhost");
-define("CURRENT_DATABASE", "1021437-yeticave-12");
+define("DB_HOST", "localhost");
+define("DB_NAME", "1021437-yeticave-12");
 
 date_default_timezone_set("Europe/Moscow");
 
