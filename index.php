@@ -7,7 +7,7 @@ $sql_lots = "SELECT lot.id, lot.name, lot.price_start, lot.image_link, lot.creat
 INNER JOIN `categories` as category
 ON lot.category_id = category.id
 WHERE lot.ends_at > NOW()
-ORDER BY `created_at` DESC LIMIT 6";
+ORDER BY `created_at` DESC LIMIT " . COUNT_ITEMS;
 // выполнение запроса
 $result_lots = mysqli_query($con, $sql_lots);
 // получение двухмерного массива лотов
