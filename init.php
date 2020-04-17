@@ -6,6 +6,7 @@ define("DB_PASSWORD", "9ZOYcLpeEb8y1Zmr");
 define("PATH_UPLOADS_IMAGE", "uploads/");
 define("DB_HOST", "localhost");
 define("DB_NAME", "1021437-yeticave-12");
+define("COUNT_ITEMS", "9");
 
 date_default_timezone_set("Europe/Moscow");
 

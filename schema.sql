@@ -38,6 +38,8 @@ CREATE TABLE `lots` (
 
 -- Создал составной индекс для поиска по автору и категории
 CREATE INDEX user_category ON lots(author_id, category_id);
+-- Добавил индекс для полнотекстового поиска
+CREATE FULLTEXT INDEX search_lot ON `lots`(name, description);
 
 -- Создание таблицы со ставками
 CREATE TABLE `bids` (

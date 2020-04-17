@@ -51,3 +51,13 @@ function validation_form($data, $rules)
     $errors = array_filter($errors);
     return $errors;
 }
+
+// функция получения данных о пользователе
+function get_data_user($link, $email_field)
+{
+    $email = mysqli_real_escape_string($link, $email_field);
+    $sql_query_data = "SELECT * FROM `users` WHERE `email` = ? ";
+    $stmt = db_get_prepare_stmt($link, $sql_query_data, [$email]);
+    mysqli_stmt_execute($stmt);
+    return mysqli_stmt_get_result($stmt);
+}
