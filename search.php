@@ -8,6 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
 
     if (!empty($str_search)) {
         $string_text = mysqli_real_escape_string($con, $str_search);
+        // информация по лотам на странице не больше 9 штук
         $query_search_lot = "SELECT lots.*, categories.name as category_name FROM `lots` as lots
         JOIN `categories` as categories
         ON categories.id = lots.category_id
@@ -15,7 +16,11 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
         $stmt = db_get_prepare_stmt($con, $query_search_lot, [$string_text]);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
-        $count_lots = mysqli_num_rows($result);
+        // общее количество лотов
+        $stmt_count = db_get_prepare_stmt($con, "SELECT COUNT(id) as 'count' FROM `lots` WHERE MATCH(name, description) AGAINST(?)", [$string_text]);
+        mysqli_stmt_execute($stmt_count);
+        $count_lots = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_count));
+        $count_lots = $count_lots["count"];
         if ($count_lots !== 0) {
             $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
             $page_content = include_template("search-page.php", [
