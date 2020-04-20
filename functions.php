@@ -61,3 +61,35 @@ function get_data_user($link, $email_field)
     mysqli_stmt_execute($stmt);
     return mysqli_stmt_get_result($stmt);
 }
+// функция пагинации
+function get_pagination($all_lots, $value_items, $current_page, $pages, $str_search)
+{
+    if ($all_lots > $value_items) {
+        $disable_style = "style='pointer-events: none;'";
+        $pagination = "<ul class=\"pagination-list\">";
+
+        if ($current_page === 1) {
+            $pagination .= "<li " . $disable_style . " class='pagination-item pagination-item-prev'><a href='#' style='color:#fff;'>Назад</a></li>";
+        } else {
+            $pagination .= "<li class='pagination-item pagination-item-prev'><a href=" . "search.php?search=" . $str_search . "&page=" . ($current_page - 1) . ">Назад</a></li>";
+        }
+
+        for ($i = 1; $i <= $pages; $i++) {
+            if ($current_page === $i) {
+                $pagination .= "<li " . $disable_style . " class='pagination-item pagination-item-active'><a>$i</a></li>";
+            } else {
+                $pagination .= "<li class='pagination-item'><a href='search.php?search=" . $str_search . "&page=" . $i . "'>" . $i . "</a></li>";
+            }
+        }
+
+        if ($pages > $current_page) {
+            $pagination .= "<li class='pagination-item pagination-item-next'><a href='search.php?search=" . $str_search . "&page=" . ($current_page + 1) . "'>Вперед</a></li>";
+        } else {
+            $pagination .= "<li " . $disable_style . " class='pagination-item pagination-item-next'><a style='color:#fff;' href='#'>Вперед</a></li>";
+        }
+        return $pagination .= "</ul>";
+    }
+
+    return false;
+}
+

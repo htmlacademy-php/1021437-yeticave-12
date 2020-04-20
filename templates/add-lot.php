@@ -1,6 +1,5 @@
 <?php
 require_once "functions.php";
-$id_category = isset($_POST["category"]) ? $_POST["category"] : "";
 ?>
 <form class="form form--add-lot container <?php if (count($errors)) : ?>form--invalid<?endif;?>" action="add.php" method="POST" enctype="multipart/form-data">
     <h2>Добавление лота</h2>

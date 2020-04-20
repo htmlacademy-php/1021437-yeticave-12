@@ -31,22 +31,6 @@ require_once "functions.php";
                 <?endforeach;?>
             </ul>
         </section>
-        <?php if($count_lots > COUNT_ITEMS) : ?>
-        <ul class="pagination-list">
-            <?php if(intval($current_page) === 1) : ?>
-                <li style="pointer-events: none;" class="pagination-item pagination-item-prev"><a href="#" style="color:#fff;">Назад</a></li>
-            <?else : ?>
-                <li class="pagination-item pagination-item-prev"><a href="<?= "search.php?search=" . $_GET["search"] . "&page=" . ($_GET["page"] - 1);?>">Назад</a></li>
-            <?endif;?>
-            <?php foreach ($pages_number as $item) : ?>
-                <li class="pagination-item <?php if (intval($current_page) === intval($item)): ?>pagination-item-active <?endif;?>"><a href="<?php if (isset($_GET["page"])) : ?><?= "search.php?search=" . $_GET["search"] . "&page=".$item;?><?else : ?><?=$_SERVER["REQUEST_URI"]."&page=".$item?><?endif;?>"><?=$item;?></a></li>
-            <?endforeach;?>
-            <?php if(count($pages_number) > $current_page) : ?>
-                <li class="pagination-item pagination-item-next"><a href="<?php if(isset($_GET["page"])) : ?><?="search.php?search=" . $_GET["search"] . "&page=" . ($_GET["page"] + 1);?><?else : ?><?="search.php?search=" . $_GET["search"] . "&page=2";?><?endif;?>">Вперед</a></li>
-            <?else : ?>
-                <li style="pointer-events: none;" class="pagination-item pagination-item-next"><a style="color:#fff;" href="">Вперед</a></li>
-            <?endif;?>
-        </ul>
-        <?endif;?>
+        <?php echo get_pagination($count_lots, COUNT_ITEMS, $current_page, $page_count, $str_search)?>
     <?endif;?>
 </div>

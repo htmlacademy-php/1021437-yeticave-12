@@ -11,18 +11,14 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
         $string_text = mysqli_real_escape_string($con, $str_search);
         //узнаем текущую страницу
         $current_page = $_GET["page"] ?? 1;
-        //количество элементов на странице
-        $page_items = COUNT_ITEMS;
         $stmt_count = db_get_prepare_stmt($con, "SELECT COUNT(id) as 'count' FROM `lots` WHERE MATCH(name, description) AGAINST(?)", [$string_text]);
         mysqli_stmt_execute($stmt_count);
         $count_lots = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_count));
         $count_lots = $count_lots["count"];
         // скольо всего страниц с элементами поиска
-        $page_count = ceil($count_lots / $page_items);
+        $page_count = ceil($count_lots / COUNT_ITEMS);
         //узнаем отсуп в количестве элементов
-        $offset = ($current_page - 1) * $page_items;
-        //создаем массив из количетсва страниц
-        $pages_number = range(1, $page_count);
+        $offset = ($current_page - 1) * COUNT_ITEMS;
 
         // информация по лотам на странице в количестве 9 штук и со смещением
         $query_search_lot = "SELECT lots.*, categories.name as category_name FROM `lots` as lots
@@ -39,8 +35,8 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
                 "str_search" => $string_text,
                 "lots" => $lots,
                 "count_lots" => $count_lots,
-                "pages_number" => $pages_number,
-                "current_page" => $current_page,
+                "page_count" => $page_count,
+                "current_page" => (int)$current_page,
             ]);
         } else {
             $page_content = include_template("search-page.php", [

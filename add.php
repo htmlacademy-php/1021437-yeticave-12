@@ -114,6 +114,7 @@ VALUES
         $page_content = include_template("add-lot.php", [
             "categories" => $categories,
             "errors" => $errors,
+            "id_category" => $_POST["category"] ?? "",
         ]);
     }
 } else {

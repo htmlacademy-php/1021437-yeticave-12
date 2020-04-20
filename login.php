@@ -55,10 +55,15 @@ if (isset($_SESSION['user'])) {
         $page_content = include_template("login.php", [
             "errors" => $errors,
             "text_errors" => "Вы ввели неверный email/пароль",
+            "email" => $_POST["email"] ?? "",
+            "password" => $_POST["password"] ?? "",
         ]);
     }
 } else {
-    $page_content = include_template("login.php", []);
+    $page_content = include_template("login.php", [
+        "email" => $_POST["email"] ?? "",
+        "password" => $_POST["password"] ?? "",
+    ]);
 }
 
 $layout_content = include_template("layout.php", [
