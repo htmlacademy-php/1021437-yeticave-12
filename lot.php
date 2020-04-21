@@ -22,6 +22,9 @@ $bids = mysqli_fetch_all($result_bids, MYSQLI_ASSOC);
 if ($result_lot = mysqli_query($con, $current_lot)) {
     if (mysqli_num_rows($result_lot)) {
         $lot = mysqli_fetch_assoc($result_lot);
+
+
+
         // подключаем шаблон с карточкой лота
         $page_content = include_template("current_lot.php", [
             "categories" => $categories,
@@ -38,6 +41,15 @@ if ($result_lot = mysqli_query($con, $current_lot)) {
 } else {
     $page_content = include_template("error.php", [
         "text_error" => "Ошибка подключения: " . mysqli_errno($con)
+    ]);
+}
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $_POST["cost"];
+    $page_content = include_template("current_lot.php", [
+        "categories" => $categories,
+        "lot" => $lot,
+        "bids" => $_POST["cost"],
     ]);
 }
 

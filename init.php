@@ -2,7 +2,7 @@
 session_start();
 
 define("DB_USER", "root");
-define("DB_PASSWORD", "9ZOYcLpeEb8y1Zmr");
+define("DB_PASSWORD", "147456");
 define("PATH_UPLOADS_IMAGE", "uploads/");
 define("DB_HOST", "localhost");
 define("DB_NAME", "1021437-yeticave-12");
