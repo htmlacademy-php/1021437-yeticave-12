@@ -32,53 +32,38 @@ require_once "functions.php";
             </ul>
         </section>
     <?php
-        function render_pagination($name_class_default, $name_important=NULL, $path, $text_button, $text_search=NULL, $current_page=NULL)
+        function render_pagination($path, $text_button, $string_search=NULL, $current_page=NULL,  $class_important=NULL, $disable_style=NULL)
         {
-            $disable_style = "style='pointer-events: none;'";
-            $block_pagination = "<li class='" . $name_class_default . " ";
-            if(isset($name_important) && $path === '#') {
-                return $block_pagination . $name_important . "'" . "><a href='#'" . $disable_style . ">". $text_button ."</a></li>";
-            }
-            switch ($text_button) {
-                case 'Назад':
-                    return $block_pagination . $name_important . "'><a href='" . $path . $text_search .  "&page="  . ($current_page - 1) . "'>Назад</a></li>";
-                case 'Вперед':
-                    return $block_pagination . $name_important . "'><a href='" . $path . $text_search .  "&page="  . ($current_page + 1) . "'>Вперед</a></li>";
-                default:
-                    return $block_pagination . "'><a href='" . $path . $text_search .  "&page="  . $current_page . "'>" . $current_page . "</a></li>";
-            }
-            return $block_pagination;
+            $disable_style === 1 ? $disable_style = "style='pointer-events: none;'" : $disable_style = "";
+            return "<li $disable_style class='pagination-item " . $class_important . "'><a href='" . $path . $string_search."&page=" . $current_page . "'>$text_button</a></li>";
         }
-
-// функция пагинации
+        // функция пагинации
         function get_pagination($all_lots, $value_items, $current_page, $pages, $str_search)
         {
             if ($all_lots > $value_items) {
                 $pagination = "<ul class='pagination-list'>";
 
                 if ($current_page === 1) {
-                    $pagination .= render_pagination("pagination-item", "pagination-item-prev", "#", "Назад");
+                    $pagination .= render_pagination("#", "Назад", NULL,NULL, "pagination-item-prev", 1);
                 } else {
-                    $pagination .= render_pagination ("pagination-item", "pagination-item-prev", "search.php?search=", "Назад", $str_search, $current_page);
+                    $pagination .= render_pagination("search.php?search=", "Назад", $str_search, $current_page - 1, "pagination-item-prev", 0);
                 }
 
                 for ($i = 1; $i <= $pages; $i++) {
                     if ($current_page === $i) {
-                        $pagination .= render_pagination("pagination-item", "pagination-item-active", "#", $i);
+                        $pagination .= render_pagination("#", $i, NULL,NULL, "pagination-item-active", 1);
                     } else {
-                        $pagination .= render_pagination("pagination-item", NULL, "search.php?search=", $i, $str_search, $i);
+                        $pagination .= render_pagination("search.php?search=", $i, $str_search,$i, "", 0);
                     }
                 }
 
                 if ($pages > $current_page) {
-                    $pagination .= render_pagination ("pagination-item", "pagination-item-next", "search.php?search=", "Вперед", $str_search, $current_page);
+                    $pagination .= render_pagination("search.php?search=", "Вперед", $str_search, $current_page + 1, "pagination-item-next", 0);
                 } else {
-                    $pagination .= render_pagination("pagination-item", "pagination-item-next", "#", "Вперед");
-
+                    $pagination .= render_pagination("#", "Вперед", NULL,NULL, "pagination-item-next", 1);
                 }
                 return $pagination .= "</ul>";
             }
-
             return false;
         }
         ?>

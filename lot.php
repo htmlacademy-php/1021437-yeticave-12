@@ -22,9 +22,6 @@ $bids = mysqli_fetch_all($result_bids, MYSQLI_ASSOC);
 if ($result_lot = mysqli_query($con, $current_lot)) {
     if (mysqli_num_rows($result_lot)) {
         $lot = mysqli_fetch_assoc($result_lot);
-
-
-
         // подключаем шаблон с карточкой лота
         $page_content = include_template("current_lot.php", [
             "categories" => $categories,

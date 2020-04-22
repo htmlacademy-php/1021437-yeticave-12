@@ -62,5 +62,3 @@ function get_data_user($link, $email_field)
     return mysqli_stmt_get_result($stmt);
 }
 
-
-
