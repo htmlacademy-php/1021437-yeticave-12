@@ -1,5 +1,8 @@
 <?php
 require_once "functions.php";
+require_once "helpers.php";
+$current_price = get_max_price_bids($bids, $lot["price_start"]);
+
 ?>
 <section class="lot-item container">
     <h2><?= $lot["name"];?></h2>
@@ -27,17 +30,17 @@ require_once "functions.php";
                 <div class="lot-item__cost-state">
                     <div class="lot-item__rate">
                         <span class="lot-item__amount">Текущая цена</span>
-                        <span class="lot-item__cost"><?= format_sum(get_max_price_bids($bids, $lot["price_start"]))?></span>
+                        <span class="lot-item__cost"><?= format_sum($current_price)?></span>
                     </div>
                     <div class="lot-item__min-cost">
-                        Мин. ставка <span><?=format_sum($lot["step_rate"])?></span>
+                        Мин. ставка <span><?=format_sum($lot["step_rate"] + $current_price)?></span>
                     </div>
                 </div>
-                <form class="lot-item__form" action="lot.php" method="post" autocomplete="off">
-                    <p class="lot-item__form-item form__item form__item--invalid">
+                <form class="lot-item__form" action="lot.php?id=<?=$lot["id"]?>" method="post" autocomplete="off">
+                    <p class="lot-item__form-item form__item <?php if(isset($text_error)) : ?>form__item--invalid<?endif;?> ">
                         <label for="cost">Ваша ставка</label>
-                        <input id="cost" type="text" name="cost" placeholder="12 000">
-                        <span class="form__error">Введите наименование лота</span>
+                        <input id="cost" type="text" name="cost" placeholder="12 000" value="<?= $bird_sum ?? "" ?>">
+                        <span class="form__error"><?= $text_error ?? ""?></span>
                     </p>
                     <button type="submit" class="button">Сделать ставку</button>
                 </form>
@@ -50,7 +53,12 @@ require_once "functions.php";
                     <tr class="history__item">
                         <td class="history__name"><?=$bid["name"]?></td>
                         <td class="history__price"><?=format_sum($bid["price"])?></td>
-                        <td class="history__time"><?=$bid["created_at"]?></td>
+                        <?php list($hours, $minutes) = get_dt_difference($bid["created_at"]); ?>
+                        <?php if($hours === 0) : ?>
+                        <td class="history__time"><?= $minutes . " " . get_noun_plural_form($minutes, 'минута', 'минуты','минут') . " назад"?></td>
+                        <?else :?>
+                        <td class="history__time"><?= $hours . " " . get_noun_plural_form($hours, 'часа', 'часа','часов') . " " . $minutes . " " . get_noun_plural_form($minutes, 'минута', 'минуты','минут') . " назад"?></td>
+                        <?endif;?>
                     </tr>
                     <?php endforeach; ?>
                 </table>

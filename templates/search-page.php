@@ -32,10 +32,12 @@ require_once "functions.php";
             </ul>
         </section>
     <?php
-        function render_pagination($path, $text_button, $string_search=NULL, $current_page=NULL,  $class_important=NULL, $disable_style=NULL)
+        function render_button_on_pagination($path_button, $text_button, $text_search=NULL, $current_page=NULL,  $class_important=NULL, $disable=NULL)
         {
-            $disable_style === 1 ? $disable_style = "style='pointer-events: none;'" : $disable_style = "";
-            return "<li $disable_style class='pagination-item " . $class_important . "'><a href='" . $path . $string_search."&page=" . $current_page . "'>$text_button</a></li>";
+            if($disable) {
+                $disable = "style='pointer-events: none;'";
+            }
+            return "<li $disable class='pagination-item " . $class_important . "'><a href='" . $path_button . $text_search."&page=" . $current_page . "'>$text_button</a></li>";
         }
         // функция пагинации
         function get_pagination($all_lots, $value_items, $current_page, $pages, $str_search)
@@ -44,23 +46,23 @@ require_once "functions.php";
                 $pagination = "<ul class='pagination-list'>";
 
                 if ($current_page === 1) {
-                    $pagination .= render_pagination("#", "Назад", NULL,NULL, "pagination-item-prev", 1);
+                    $pagination .= render_button_on_pagination("#", "Назад", NULL,NULL, "pagination-item-prev", true);
                 } else {
-                    $pagination .= render_pagination("search.php?search=", "Назад", $str_search, $current_page - 1, "pagination-item-prev", 0);
+                    $pagination .= render_button_on_pagination("search.php?search=", "Назад", $str_search, $current_page - 1, "pagination-item-prev", false);
                 }
 
                 for ($i = 1; $i <= $pages; $i++) {
                     if ($current_page === $i) {
-                        $pagination .= render_pagination("#", $i, NULL,NULL, "pagination-item-active", 1);
+                        $pagination .= render_button_on_pagination("#", $i, NULL,NULL, "pagination-item-active", true);
                     } else {
-                        $pagination .= render_pagination("search.php?search=", $i, $str_search,$i, "", 0);
+                        $pagination .= render_button_on_pagination("search.php?search=", $i, $str_search, $i, "", false);
                     }
                 }
 
                 if ($pages > $current_page) {
-                    $pagination .= render_pagination("search.php?search=", "Вперед", $str_search, $current_page + 1, "pagination-item-next", 0);
+                    $pagination .= render_button_on_pagination("search.php?search=", "Вперед", $str_search, $current_page + 1, "pagination-item-next", false);
                 } else {
-                    $pagination .= render_pagination("#", "Вперед", NULL,NULL, "pagination-item-next", 1);
+                    $pagination .= render_button_on_pagination("#", "Вперед", NULL,NULL, "pagination-item-next", true);
                 }
                 return $pagination .= "</ul>";
             }
