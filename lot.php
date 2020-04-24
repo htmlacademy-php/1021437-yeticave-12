@@ -5,13 +5,13 @@ require_once "helpers.php";
 // получение идентификатора с помощью фильтра целое число
 $id_lot = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT);
 // выборка информации о лоте
-$current_lot = "SELECT lot.id, lot.name, lot.step_rate, ends_at, lot.price_start, lot.description, lot.image_link, lot.created_at, lot.author_id, lot.ends_at, category.name as category_name
+$current_lot = "SELECT lot.id, lot.name, lot.step_rate, ends_at, lot.price_start, lot.description, lot.image_link, lot.created_at, lot.author_id, lot.author_id, lot.ends_at, category.name as category_name
 FROM `lots` as lot
 INNER JOIN `categories` as category
 ON lot.category_id = category.id
 WHERE lot.id = '$id_lot'";
 // выборка истории ставок
-$sql_bids = "SELECT users.name, bids.price, bids.created_at FROM `bids` as bids
+$sql_bids = "SELECT users.name, bids.price, bids.created_at, users.id FROM `bids` as bids
 INNER JOIN `users` as users
 ON bids.user_id = users.id
 WHERE `lot_id` = '$id_lot'

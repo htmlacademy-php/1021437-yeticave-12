@@ -19,6 +19,12 @@ function get_dt_difference($value_time_my)
     $time_minutes = floor(($time_difference % 3600) / 60);
     return [(int)$time_hours, $time_minutes];
 }
+function get_dt_end($value_date)
+{
+   if (time() > strtotime($value_date)) {
+       return true;
+   }
+}
 function get_max_price_bids($prices, $price_start)
 {
     if (!isset($prices[0]["price"])) {

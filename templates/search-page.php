@@ -32,43 +32,44 @@ require_once "functions.php";
             </ul>
         </section>
     <?php
-        function render_button_on_pagination($path_button, $text_button, $text_search=NULL, $current_page=NULL,  $class_important=NULL, $disable=NULL)
+        function render_pagination_button($path_button, $text_button, $class_important="", $disable=false, $text_search=NULL, $current_page=NULL)
         {
             if($disable) {
                 $disable = "style='pointer-events: none;'";
             }
-            return "<li $disable class='pagination-item " . $class_important . "'><a href='" . $path_button . $text_search."&page=" . $current_page . "'>$text_button</a></li>";
+            $string_template =  '<li %1$s class="pagination-item %2$s"><a href="%3$s%4$s&page=%5$d">%6$s</a></li>';
+            return sprintf($string_template, $disable, $class_important, $path_button, $text_search, $current_page, $text_button);
         }
         // функция пагинации
-        function get_pagination($all_lots, $value_items, $current_page, $pages, $str_search)
+        function render_pagination($all_lots, $value_items, $current_page, $pages, $str_search)
         {
             if ($all_lots > $value_items) {
                 $pagination = "<ul class='pagination-list'>";
 
                 if ($current_page === 1) {
-                    $pagination .= render_button_on_pagination("#", "Назад", NULL,NULL, "pagination-item-prev", true);
+                    $pagination .= render_pagination_button("#", "Назад", "pagination-item-prev", true);
                 } else {
-                    $pagination .= render_button_on_pagination("search.php?search=", "Назад", $str_search, $current_page - 1, "pagination-item-prev", false);
+                    $pagination .= render_pagination_button("search.php?search=", "Назад", "pagination-item-prev", false, $str_search, $current_page - 1);
                 }
 
                 for ($i = 1; $i <= $pages; $i++) {
                     if ($current_page === $i) {
-                        $pagination .= render_button_on_pagination("#", $i, NULL,NULL, "pagination-item-active", true);
+                        $pagination .= render_pagination_button("#", $i, "pagination-item-active", true);
                     } else {
-                        $pagination .= render_button_on_pagination("search.php?search=", $i, $str_search, $i, "", false);
+                        $pagination .= render_pagination_button("search.php?search=", $i,  "", false, $str_search, $i);
                     }
                 }
 
                 if ($pages > $current_page) {
-                    $pagination .= render_button_on_pagination("search.php?search=", "Вперед", $str_search, $current_page + 1, "pagination-item-next", false);
+                    $pagination .= render_pagination_button("search.php?search=", "Вперед",  "pagination-item-next", false, $str_search, $current_page + 1);
                 } else {
-                    $pagination .= render_button_on_pagination("#", "Вперед", NULL,NULL, "pagination-item-next", true);
+                    $pagination .= render_pagination_button("#", "Вперед", "pagination-item-next", true);
                 }
                 return $pagination .= "</ul>";
             }
             return false;
         }
         ?>
-        <?php echo get_pagination($count_lots, COUNT_ITEMS, $current_page, $page_count, $str_search)?>
+        <?php echo render_pagination($count_lots, COUNT_ITEMS, $current_page, $page_count, $str_search)?>
     <?endif;?>
 </div>
