@@ -20,8 +20,8 @@ if (isset($bids)) {
             </p>
         </div>
         <div class="lot-item__right">
-<!--        Не показываем при условиях: пользователь не авторизован; срок размещения лота истёк; лот создан текущим пользователем; последняя ставка сделана текущим пользователем.-->
             <?php if(isset($_SESSION["user"]) && (!get_dt_end($lot["ends_at"])) && ($_SESSION["user"]["id"]) !== (int)$lot["author_id"] && $last_bet !== $_SESSION["user"]["id"]) : ?>
+                <!--        Не показываем при условиях: пользователь не авторизован; срок размещения лота истёк; лот создан текущим пользователем; последняя ставка сделана текущим пользователем.-->
             <div class="lot-item__state">
                 <?php
                 list($hours, $minutes) = get_dt_range($lot["ends_at"]);
@@ -59,9 +59,9 @@ if (isset($bids)) {
                         <td class="history__price"><?=format_sum($bid["price"])?></td>
                         <?php list($hours, $minutes) = get_dt_difference($bid["created_at"]); ?>
                         <?php if($hours === 0) : ?>
-                        <td class="history__time"><?= $minutes . " " . get_noun_plural_form($minutes, 'минута', 'минуты','минут') . " назад"?></td>
+                            <td class="history__time"><?= $minutes . " " . get_noun_plural_form($minutes, 'минута', 'минуты','минут') . " назад"?></td>
                         <?else :?>
-                        <td class="history__time"><?= $hours . " " . get_noun_plural_form($hours, 'часа', 'часа','часов') . " " . $minutes . " " . get_noun_plural_form($minutes, 'минута', 'минуты','минут') . " назад"?></td>
+                            <td class="history__time"><?= $hours . " " . get_noun_plural_form($hours, 'часа', 'часа','часов') . " " . $minutes . " " . get_noun_plural_form($minutes, 'минута', 'минуты','минут') . " назад"?></td>
                         <?endif;?>
                     </tr>
                     <?php endforeach; ?>

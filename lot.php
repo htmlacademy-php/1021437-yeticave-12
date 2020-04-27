@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_SESSION["user"])) {
     $max_value_bird = mysqli_query($con, "SELECT MAX(price) as `max_price` FROM `bids` WHERE `lot_id` =" . $id_lot .  " LIMIT 1");
     $max_value = mysqli_fetch_assoc($max_value_bird);
 
-    if ($max_value["max_price"] !== NULL) {
+    if ($max_value["max_price"] !== null) {
         $new_sum = $max_value["max_price"] + $lot["step_rate"];
     } else {
         $new_sum = $lot["price_start"] + $lot["step_rate"];

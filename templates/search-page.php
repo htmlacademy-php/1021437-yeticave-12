@@ -31,45 +31,6 @@ require_once "functions.php";
                 <?endforeach;?>
             </ul>
         </section>
-    <?php
-        function render_pagination_button($path_button, $text_button, $class_important="", $disable=false, $text_search=NULL, $current_page=NULL)
-        {
-            if($disable) {
-                $disable = "style='pointer-events: none;'";
-            }
-            $string_template =  '<li %1$s class="pagination-item %2$s"><a href="%3$s%4$s&page=%5$d">%6$s</a></li>';
-            return sprintf($string_template, $disable, $class_important, $path_button, $text_search, $current_page, $text_button);
-        }
-        // функция пагинации
-        function render_pagination($all_lots, $value_items, $current_page, $pages, $str_search)
-        {
-            if ($all_lots > $value_items) {
-                $pagination = "<ul class='pagination-list'>";
-
-                if ($current_page === 1) {
-                    $pagination .= render_pagination_button("#", "Назад", "pagination-item-prev", true);
-                } else {
-                    $pagination .= render_pagination_button("search.php?search=", "Назад", "pagination-item-prev", false, $str_search, $current_page - 1);
-                }
-
-                for ($i = 1; $i <= $pages; $i++) {
-                    if ($current_page === $i) {
-                        $pagination .= render_pagination_button("#", $i, "pagination-item-active", true);
-                    } else {
-                        $pagination .= render_pagination_button("search.php?search=", $i,  "", false, $str_search, $i);
-                    }
-                }
-
-                if ($pages > $current_page) {
-                    $pagination .= render_pagination_button("search.php?search=", "Вперед",  "pagination-item-next", false, $str_search, $current_page + 1);
-                } else {
-                    $pagination .= render_pagination_button("#", "Вперед", "pagination-item-next", true);
-                }
-                return $pagination .= "</ul>";
-            }
-            return false;
-        }
-        ?>
-        <?php echo render_pagination($count_lots, COUNT_ITEMS, $current_page, $page_count, $str_search)?>
+        <?php echo render_pagination($count_lots, COUNT_ITEMS, $current_page, $page_count, $str_search, "search.php?search=")?>
     <?endif;?>
 </div>

@@ -64,5 +64,7 @@ require_once "functions.php";
         </tr>
         <? endforeach;?>
     </table>
+    <?php echo render_pagination($count_lots, COUNT_ITEMS, $current_page, $page_count, '', 'my-bets.php?');?>
 </section>
+
 <?endif; ?>

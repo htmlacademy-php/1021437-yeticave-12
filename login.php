@@ -6,12 +6,8 @@ require_once "helpers.php";
 if (isset($_SESSION['user'])) {
     header("Location: index.php");
     exit();
-} else if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
+} elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
     $errors = [];
-
-
-
     function validate_email_field($email_field, $link)
     {
         if (empty($email_field)) {
@@ -25,7 +21,7 @@ if (isset($_SESSION['user'])) {
 
     function validate_password_field($password_field, $email_field, $link)
     {
-        if(empty($password_field)) {
+        if (empty($password_field)) {
             return "Это поле обязательно к заполнению";
         }
         $result = get_data_user($link, $email_field);
@@ -39,7 +35,7 @@ if (isset($_SESSION['user'])) {
         "email" => function () use ($con) {
             return validate_email_field($_POST["email"], $con);
         },
-        "password" => function ()  use ($con) {
+        "password" => function () use ($con) {
             return validate_password_field($_POST["password"], $_POST["email"], $con);
         }
     ];
@@ -73,4 +69,3 @@ $layout_content = include_template("layout.php", [
 ]);
 
 print($layout_content);
-

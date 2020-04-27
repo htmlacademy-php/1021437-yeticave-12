@@ -21,9 +21,9 @@ function get_dt_difference($value_time_my)
 }
 function get_dt_end($value_date)
 {
-   if (time() > strtotime($value_date)) {
-       return true;
-   }
+    if (time() > strtotime($value_date)) {
+        return true;
+    }
 }
 function get_max_price_bids($prices, $price_start)
 {
@@ -74,4 +74,53 @@ function get_data_user($link, $email_field)
     mysqli_stmt_execute($stmt);
     return mysqli_stmt_get_result($stmt);
 }
+function render_pagination_button($path_button, $text_button, $class_important = "", $disable = false, $text_search = null, $current_page = null)
+{
+    if ($disable) {
+        $disable = "style='pointer-events: none;'";
+    }
+    $string_template =  '<li %s class="pagination-item %s"><a href="%s%s&page=%d">%s</a></li>';
+    return sprintf($string_template, $disable, $class_important, $path_button, $text_search, $current_page, $text_button);
+}
+// функция пагинации
+function render_pagination($all_lots, $value_items, $current_page, $pages, $str_search, $path_search)
+{
+    if ($all_lots > $value_items) {
+        $pagination = "<ul class='pagination-list'>";
 
+        if ($current_page === 1) {
+            $pagination .= render_pagination_button("#", "Назад", "pagination-item-prev", true);
+        } else {
+            $pagination .= render_pagination_button($path_search, "Назад", "pagination-item-prev", false, $str_search, $current_page - 1);
+        }
+
+        for ($i = 1; $i <= $pages; $i++) {
+            if ($current_page === $i) {
+                $pagination .= render_pagination_button("#", $i, "pagination-item-active", true);
+            } else {
+                $pagination .= render_pagination_button($path_search, $i, "", false, $str_search, $i);
+            }
+        }
+
+        if ($pages > $current_page) {
+            $pagination .= render_pagination_button($path_search, "Вперед", "pagination-item-next", false, $str_search, $current_page + 1);
+        } else {
+            $pagination .= render_pagination_button("#", "Вперед", "pagination-item-next", true);
+        }
+        return $pagination . "</ul>";
+    }
+    return false;
+}
+// узнаем общее количество лотов, отступов, количество страниц
+function get_count_items($link, $sql_query, $data)
+{
+    $current_page = $_GET["page"] ?? 1;
+    $current_data = mysqli_real_escape_string($link, $data);
+    $stmt_count = db_get_prepare_stmt($link, $sql_query, [$current_data]);
+    mysqli_stmt_execute($stmt_count);
+    $count_lots = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_count));
+    $count_lots = $count_lots["count"];
+    $page_count = ceil($count_lots / COUNT_ITEMS);
+    $offset = ($current_page - 1) * COUNT_ITEMS;
+    return [$current_data, $current_page, $count_lots, $page_count, $offset];
+}
