@@ -26,7 +26,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_SESSION["user"])) {
     $lot = mysqli_fetch_assoc(mysqli_query($con, $current_lot));
 
     // узнаем есть ли ставки по этому лоту
-    $max_value_bird = mysqli_query($con, "SELECT MAX(price) as `max_price` FROM `bids` WHERE `lot_id` =" . $id_lot .  " LIMIT 1");
+    $max_value_bird = mysqli_query($con,
+        "SELECT MAX(price) as `max_price` FROM `bids` WHERE `lot_id` =" . $id_lot . " LIMIT 1");
     $max_value = mysqli_fetch_assoc($max_value_bird);
 
     if ($max_value["max_price"] !== null) {
@@ -40,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_SESSION["user"])) {
         $stmt = db_get_prepare_stmt($con, $sql_insert_bids, [$bird_sum, $_SESSION["user"]["id"], $id_lot]);
         $result = mysqli_stmt_execute($stmt);
         if ($result) {
-            header("Location: lot.php?id=".$id_lot);
+            header("Location: lot.php?id=" . $id_lot);
         } else {
             $page_content = include_template("error.php", [
                 "text_error" => "Ошибка вставки: " . mysqli_errno($con)
@@ -55,26 +56,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_SESSION["user"])) {
             "text_error" => "Сумма ставки меньше минимальной или введено некорректное значение",
         ]);
     }
-} else if ($result_lot = mysqli_query($con, $current_lot)) {
-    if (mysqli_num_rows($result_lot)) {
-        $lot = mysqli_fetch_assoc($result_lot);
-        // подключаем шаблон с карточкой лота
-        $page_content = include_template("current_lot.php", [
-            "categories" => $categories,
-            "lot" => $lot,
-            "bids" => $bids,
-        ]);
+} else {
+    if ($result_lot = mysqli_query($con, $current_lot)) {
+        if (mysqli_num_rows($result_lot)) {
+            $lot = mysqli_fetch_assoc($result_lot);
+            // подключаем шаблон с карточкой лота
+            $page_content = include_template("current_lot.php", [
+                "categories" => $categories,
+                "lot" => $lot,
+                "bids" => $bids,
+            ]);
+        } else {
+            // подключаем шаблон с ошибкой
+            $page_content = include_template("error.php", [
+                "code_error" => "404",
+                "text_error" => "Не удалось найти страницу с лотом №-" . "<b>" . $id_lot . "</b>",
+            ]);
+        }
     } else {
-        // подключаем шаблон с ошибкой
         $page_content = include_template("error.php", [
-            "code_error" => "404",
-            "text_error" => "Не удалось найти страницу с лотом №-" . "<b>" . $id_lot . "</b>",
+            "text_error" => "Ошибка подключения: " . mysqli_errno($con)
         ]);
     }
-} else {
-    $page_content = include_template("error.php", [
-        "text_error" => "Ошибка подключения: " . mysqli_errno($con)
-    ]);
 }
 
 // собираем итоговую страницу лота

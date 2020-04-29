@@ -19,6 +19,7 @@ if (!isset($_SESSION["user"])) {
         }
         return check_field($field_text);
     }
+
     // функция проверки начальной цены и шага ставки
     function validate_field_price($field_price)
     {
@@ -31,11 +32,13 @@ if (!isset($_SESSION["user"])) {
         }
         return check_field($field_price);
     }
+
     // функция проверки выбора категории
     function validate_field_category($field_category)
     {
         return check_field($field_category);
     }
+
     // функция проверки даты
     function validate_field_date($field_date)
     {
@@ -49,6 +52,7 @@ if (!isset($_SESSION["user"])) {
         }
         return check_field($field_date);
     }
+
     //правила проверок
     $rules = [
         "lot-name" => function () {
@@ -82,7 +86,7 @@ if (!isset($_SESSION["user"])) {
         if ($type_file !== "image/jpeg" && $type_file !== "image/png") {
             $errors["lot-img"] = "Поддерживается загрузка только png, jpg, jpeg " . $type_file;
         } else {
-            move_uploaded_file($_FILES["lot-img"]["tmp_name"], PATH_UPLOADS_IMAGE .$file_name);
+            move_uploaded_file($_FILES["lot-img"]["tmp_name"], PATH_UPLOADS_IMAGE . $file_name);
             if ($_FILES["lot-img"]["error"] !== UPLOAD_ERR_OK) {
                 return "Ошибка при загрузке файла - код ошибки: " . $_FILES["lot-img"]["error"];
             }
@@ -96,13 +100,22 @@ if (!isset($_SESSION["user"])) {
 (`created_at`, `name`, `description`, `image_link`, `price_start`, `ends_at`, `step_rate`, `author_id`, `user_winner_id`, `category_id`)
 VALUES
 (NOW(), ?, ?, ?, ?, ?, ?, ?, '0', ?)";
-        $stmt = db_get_prepare_stmt($con, $query_insert_database_lot, [$_POST["lot-name"],$_POST["message"], $file_url, $_POST["lot-rate"], $_POST["lot-date"], $_POST["lot-step"], $_SESSION["user"]["id"] ,$_POST["category"]]);
+        $stmt = db_get_prepare_stmt($con, $query_insert_database_lot, [
+            $_POST["lot-name"],
+            $_POST["message"],
+            $file_url,
+            $_POST["lot-rate"],
+            $_POST["lot-date"],
+            $_POST["lot-step"],
+            $_SESSION["user"]["id"],
+            $_POST["category"]
+        ]);
         $result = mysqli_stmt_execute($stmt);
 
         if ($result) {
             $last_id = mysqli_insert_id($con);
             // переадресация на страницу с новым добавленным лотом
-            header("Location: lot.php?id=".$last_id);
+            header("Location: lot.php?id=" . $last_id);
         } else {
             echo "Ошибка вставки " . mysqli_error($con);
         }
@@ -110,7 +123,7 @@ VALUES
         $page_content = include_template("add-lot.php", [
             "categories" => $categories,
             "errors" => $errors,
-            "id_category" => $_POST["category"] ?? "",
+            "id_category" => $_POST["category"] ?? null,
         ]);
     }
 } else {

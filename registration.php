@@ -50,7 +50,8 @@ if (isset($_SESSION["user"])) {
         $query_insert_database_user = "INSERT INTO `users` (`registration_at`, `email`, `name`, `password`, `users_info`)
 VALUES
 (NOW(), ?, ?, ?, ?)";
-        $stmt = db_get_prepare_stmt($con, $query_insert_database_user, [$_POST["email"], $_POST["name"], $password, $_POST["message"]]);
+        $stmt = db_get_prepare_stmt($con, $query_insert_database_user,
+            [$_POST["email"], $_POST["name"], $password, $_POST["message"]]);
         $result = mysqli_stmt_execute($stmt);
         if ($result) {
             header("location: login.php");

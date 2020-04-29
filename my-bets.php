@@ -3,7 +3,9 @@ require_once "init.php";
 require_once "helpers.php";
 
 if (isset($_SESSION["user"])) {
-    list($current_id, $current_page, $count_lots, $page_count, $offset) = get_count_items($con, "SELECT COUNT(id) as 'count' FROM `bids` WHERE `user_id` = ?", $_SESSION["user"]["id"]);
+    list($current_page, $count_lots, $page_count, $offset) = compute_pagination_offset_and_limit($con,
+        "SELECT COUNT(id) as 'count' FROM `bids` WHERE `user_id` = ?", $_SESSION["user"]["id"], $_GET["page"]);
+    $current_id = get_escape_string($con, $_SESSION["user"]["id"]);
     $result_bids = mysqli_query($con, "SELECT lots.name, lots.image_link, categories.name as category, lots.ends_at, bids.created_at, bids.price, lots.description, lots.id, lots.user_winner_id, users.users_info  
         FROM `bids` as bids 
         JOIN `lots` as lots ON lots.id = bids.lot_id 

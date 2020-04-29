@@ -3,11 +3,11 @@ require_once "init.php";
 require_once "helpers.php";
 
 if (isset($_GET["category"]) && $_GET["category"] !== "") {
-    list($current_category, $current_page, $count_lots, $page_count, $offset) = get_count_items($con, "SELECT COUNT(`lots`.`id`) as 'count' FROM `lots` 
+    list($current_page, $count_lots, $page_count, $offset) = compute_pagination_offset_and_limit($con, "SELECT COUNT(`lots`.`id`) as 'count' FROM `lots` 
     JOIN `categories`
     ON `categories`.`id` = `lots`.`category_id`
-    WHERE `ends_at` > NOW() and `categories`.`code` = ?", $_GET["category"]);
-
+    WHERE `ends_at` > NOW() and `categories`.`code` = ?", $_GET["category"], $_GET["page"]);
+    $current_category = get_escape_string($con, $_GET["category"]);
     $sql_query_lots_category = "SELECT lots.id, lots.image_link, lots.name, categories.name as category, categories.code, lots.ends_at, 
 (SELECT IF (MAX(bids.price) = NULL, MAX(bids.price), lots.price_start)  FROM `bids` as bids WHERE bids.lot_id = lots.id) as price,
 (SELECT COUNT(id) FROM `bids` as bids WHERE bids.lot_id = lots.id) as count_bets
