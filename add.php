@@ -123,7 +123,7 @@ VALUES
         $page_content = include_template("add-lot.php", [
             "categories" => $categories,
             "errors" => $errors,
-            "id_category" => $_POST["category"] ?? null,
+            "id_category" => post_value("category", null),
         ]);
     }
 } else {
@@ -135,7 +135,7 @@ VALUES
 $layout_content = include_template("layout.php", [
     "main_content" => $page_content,
     "title_page" => "Добавление нового лота",
-    "user_name" => $_SESSION["user"]["name"] ?? "",
+    "user_name" => session_user_value("name", ""),
     "categories" => $categories,
     "css_calendar" => "<link href=\"css/flatpickr.min.css\" rel=\"stylesheet\">"
 ]);

@@ -8,7 +8,7 @@ require_once "functions.php";
         <div class="form__item <?php if (isset($errors["lot-name"])) : ?>form__item--invalid<? endif; ?>">
             <label for="lot-name">Наименование <sup>*</sup></label>
             <input id="lot-name" type="text" name="lot-name" placeholder="Введите наименование лота"
-                   value="<?= htmlspecialchars(get_field_value("lot-name")) ?>">
+                   value="<?= htmlspecialchars(post_value("lot-name")) ?>">
             <span class="form__error"><?= $errors["lot-name"] ?? ""; ?></span>
         </div>
         <div class="form__item <?php if (isset($errors["category"])) : ?>form__item--invalid<? endif; ?>">
@@ -26,7 +26,7 @@ require_once "functions.php";
     <div class="form__item form__item--wide <?php if (isset($errors["message"])) : ?>form__item--invalid<? endif; ?>">
         <label for="message">Описание <sup>*</sup></label>
         <textarea id="message" name="message"
-                  placeholder="Напишите описание лота"><?= htmlspecialchars(get_field_value("message")); ?></textarea>
+                  placeholder="Напишите описание лота"><?= htmlspecialchars(post_value("message")); ?></textarea>
         <span class="form__error"><?= $errors["message"] ?? ""; ?></span>
     </div>
     <div class="form__item form__item--file <?php if (isset($errors["lot-img"])) : ?>form__item--invalid<? endif; ?>">
@@ -44,20 +44,20 @@ require_once "functions.php";
             class="form__item form__item--small <?php if (isset($errors["lot-rate"])) : ?>form__item--invalid<? endif; ?>">
             <label for="lot-rate">Начальная цена <sup>*</sup></label>
             <input id="lot-rate" type="text" name="lot-rate" placeholder="0"
-                   value="<?= htmlspecialchars(get_field_value("lot-rate")); ?>">
+                   value="<?= htmlspecialchars(post_value("lot-rate")); ?>">
             <span class="form__error"><?= $errors["lot-rate"] ?? ""; ?></span>
         </div>
         <div
             class="form__item form__item--small <?php if (isset($errors["lot-step"])) : ?>form__item--invalid<? endif; ?>">
             <label for="lot-step">Шаг ставки <sup>*</sup></label>
             <input id="lot-step" type="text" name="lot-step" placeholder="0"
-                   value="<?= htmlspecialchars(get_field_value("lot-step")); ?>">
+                   value="<?= htmlspecialchars(post_value("lot-step")); ?>">
             <span class="form__error"><?= $errors["lot-step"] ?? ""; ?></span>
         </div>
         <div class="form__item <?php if (isset($errors["lot-date"])) : ?>form__item--invalid<? endif; ?>">
             <label for="lot-date">Дата окончания торгов <sup>*</sup></label>
             <input class="form__input-date" id="lot-date" type="text" name="lot-date"
-                   value="<?= htmlspecialchars(get_field_value("lot-date")); ?>"
+                   value="<?= htmlspecialchars(post_value("lot-date")); ?>"
                    placeholder="Введите дату в формате ГГГГ-ММ-ДД">
             <span class="form__error"><?= $errors["lot-date"] ?? "" ?></span>
         </div>

@@ -3,8 +3,10 @@ require_once "init.php";
 require_once "helpers.php";
 
 if (isset($_SESSION["user"])) {
-    list($current_page, $count_lots, $page_count, $offset) = compute_pagination_offset_and_limit($con,
-        "SELECT COUNT(id) as 'count' FROM `bids` WHERE `user_id` = ?", $_SESSION["user"]["id"], $_GET["page"]);
+    list($count_lots, $page_count) = compute_pagination_offset_and_limit($con,
+        "SELECT COUNT(id) as 'count' FROM `bids` WHERE `user_id` = ?", $_SESSION["user"]["id"]);
+    $current_page = get_value("page", 1);
+    $offset = get_offset_items($current_page,COUNT_ITEMS);
     $current_id = get_escape_string($con, $_SESSION["user"]["id"]);
     $result_bids = mysqli_query($con, "SELECT lots.name, lots.image_link, categories.name as category, lots.ends_at, bids.created_at, bids.price, lots.description, lots.id, lots.user_winner_id, users.users_info  
         FROM `bids` as bids 
@@ -17,10 +19,10 @@ if (isset($_SESSION["user"])) {
 
     $page_content = include_template("bets.php", [
         "bets" => $bets,
-        "user_id" => $_SESSION["user"]["id"],
+        "user_id" => session_user_value("id"),
         "count_lots" => $count_lots,
         "page_count" => $page_count,
-        "current_page" => (int)$current_page,
+        "current_page" => $current_page,
     ]);
 } else {
     header("Location: /");
@@ -30,7 +32,7 @@ if (isset($_SESSION["user"])) {
 $layout_content = include_template("layout.php", [
     "main_content" => $page_content,
     "title_page" => "Страница лота",
-    "user_name" => $_SESSION["user"]["name"] ?? "",
+    "user_name" => session_user_value("name", ""),
     "categories" => $categories,
 ]);
 

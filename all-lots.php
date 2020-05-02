@@ -3,10 +3,12 @@ require_once "init.php";
 require_once "helpers.php";
 
 if (isset($_GET["category"]) && $_GET["category"] !== "") {
-    list($current_page, $count_lots, $page_count, $offset) = compute_pagination_offset_and_limit($con, "SELECT COUNT(`lots`.`id`) as 'count' FROM `lots` 
+    list($count_lots, $page_count) = compute_pagination_offset_and_limit($con, "SELECT COUNT(`lots`.`id`) as 'count' FROM `lots` 
     JOIN `categories`
     ON `categories`.`id` = `lots`.`category_id`
-    WHERE `ends_at` > NOW() and `categories`.`code` = ?", $_GET["category"], $_GET["page"]);
+    WHERE `ends_at` > NOW() and `categories`.`code` = ?", $_GET["category"]);
+    $current_page = get_value("page", 1);
+    $offset = get_offset_items($current_page,COUNT_ITEMS);
     $current_category = get_escape_string($con, $_GET["category"]);
     $sql_query_lots_category = "SELECT lots.id, lots.image_link, lots.name, categories.name as category, categories.code, lots.ends_at, 
 (SELECT IF (MAX(bids.price) = NULL, MAX(bids.price), lots.price_start)  FROM `bids` as bids WHERE bids.lot_id = lots.id) as price,
@@ -23,7 +25,7 @@ WHERE lots.ends_at > NOW() and categories.code = '" . $current_category . "' ORD
         "current_category" => $current_category ?? "",
         "count_lots" => $count_lots,
         "page_count" => $page_count,
-        "current_page" => (int)$current_page,
+        "current_page" => $current_page,
     ]);
 } else {
     http_response_code(403);
@@ -38,7 +40,7 @@ WHERE lots.ends_at > NOW() and categories.code = '" . $current_category . "' ORD
 $layout_content = include_template("layout.php", [
     "main_content" => $page_content,
     "title_page" => "Страница лота",
-    "user_name" => $_SESSION["user"]["name"] ?? "",
+    "user_name" => session_user_value("name", ""),
     "categories" => $categories,
 ]);
 

@@ -6,8 +6,10 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
     $str_search = trim($_GET["search"]);
 
     if (!empty($str_search)) {
-        list($current_page, $count_lots, $page_count, $offset) = compute_pagination_offset_and_limit($con,
-            "SELECT COUNT(id) as 'count' FROM `lots` WHERE MATCH(name, description) AGAINST(?)", $str_search, $_GET["page"]);
+        list($count_lots, $page_count) = compute_pagination_offset_and_limit($con,
+            "SELECT COUNT(id) as 'count' FROM `lots` WHERE MATCH(name, description) AGAINST(?)", $str_search);
+        $current_page = get_value("page", 1);
+        $offset = get_offset_items($current_page,COUNT_ITEMS);
         // информация по лотам на странице в количестве 9 штук и со смещением
         $query_search_lot = "SELECT lots.*, categories.name as category_name FROM `lots` as lots
         JOIN `categories` as categories
@@ -25,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
                 "lots" => $lots,
                 "count_lots" => $count_lots,
                 "page_count" => $page_count,
-                "current_page" => (int)$current_page,
+                "current_page" => $current_page,
             ]);
         } else {
             $page_content = include_template("search-page.php", [
@@ -42,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
 $layout_content = include_template("layout.php", [
     "main_content" => $page_content,
     "title_page" => "Страница регистрации",
-    "user_name" => $_SESSION["user"]["name"] ?? "",
+    "user_name" => session_user_value("name", ""),
     "categories" => $categories,
 ]);
 

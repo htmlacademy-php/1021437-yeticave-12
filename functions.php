@@ -93,14 +93,44 @@ function check_field($field)
 
 /**
  * Возвращает значение из глобального массива $_POST
- * если оно не пустое
- * @param string $field_name Поле с текстом
+ * если оно не пустое или дефолтное значение
+ * @param string $name Имя переменной
+ * @param string|integer/null $default Дефолтное значение
  *
- * @return string Текст
+ * @return string|integer Текст
  */
-function get_field_value($field_name)
+function post_value(string $name, $default = null)
 {
-    return $_POST[$field_name] ?? "";
+    if (isset($_POST[$name])) {
+        return $_POST[$name];
+    }
+    return $default;
+}
+
+function session_user_value(string $name, $default = null)
+{
+    if (isset($_SESSION["user"][$name])) {
+        return $_SESSION["user"][$name];
+    }
+    return $default;
+}
+
+function get_to_integer(string $numb)
+{
+    return (int)$numb;
+}
+
+function get_value(string $name, $default = null)
+{
+    if (isset($_GET[$name])) {
+
+        switch ($name) {
+            case "page" :
+                return get_to_integer($_GET[$name]);
+        }
+
+    }
+    return $default;
 }
 
 /**
@@ -188,8 +218,7 @@ function render_pagination($all_lots, $value_items, $current_page, $pages, $str_
         if ($current_page === 1) {
             $pagination .= render_pagination_button("#", "Назад", "pagination-item-prev", true);
         } else {
-            $pagination .= render_pagination_button($path_search, "Назад", "pagination-item-prev", false, $str_search,
-                $current_page - 1);
+            $pagination .= render_pagination_button($path_search, "Назад", "pagination-item-prev", false, $str_search, $current_page - 1);
         }
 
         for ($i = 1; $i <= $pages; $i++) {
@@ -225,23 +254,77 @@ function get_escape_string($connect, $text)
 }
 
 /**
+ * Возвращает значение отступа из расчета
+ * количесвта элементов на странице
+ * @param int $page Номер страницы
+ * @param int $count_items Количество элементов на странице
+ *
+ * @return int Число
+ */
+function get_offset_items($page, $count_items)
+{
+    $offset = ($page - 1) * $count_items;
+    return abs($offset);
+}
+
+/**
  * Обрабатывает запрос с количеством лотов и
  * возращает данные для пагинации
  * @param mysqli $link Ресурс соединения
  * @param string $sql_query SQL запрос с количеством лотов
  * @param string/int $data Данные для запроса
- * @param int $page Номер страницы
  *
  * @return array Текущая страница, количество лотов, количество страниц, отступ
  */
-function compute_pagination_offset_and_limit($link, $sql_query, $data, $page)
+function compute_pagination_offset_and_limit($link, $sql_query, $data)
 {
-    $current_page = $page ?? 1;
     $stmt_count = db_get_prepare_stmt($link, $sql_query, [$data]);
     mysqli_stmt_execute($stmt_count);
     $count_lots = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_count));
     $count_lots = $count_lots["count"];
     $page_count = ceil($count_lots / COUNT_ITEMS);
-    $offset = ($current_page - 1) * COUNT_ITEMS;
-    return [$current_page, $count_lots, $page_count, $offset];
+    return [$count_lots, $page_count];
+}
+
+/**
+ * Вычисляет стоимость лота с учетом ставок и шагов
+ * @param integer $max_price Максимальная цена ставки
+ * @param integer $step Шаг ставки
+ * @param integer $price_start Стартовая цена лота
+ *
+ * @return integer $sum Итоговая сумма
+ */
+function get_max_price_lot($max_price, $step, $price_start)
+{
+    if ($max_price !== null) {
+        $sum = $max_price + $step;
+    } else {
+        $sum = $price_start + $step;
+    }
+    return $sum;
+}
+
+/**
+ * Записывает значенеи ставки в базу если оно
+ * больше текущей цены или возращает ошибку
+ * @param integer $bird_sum Сумма ставки
+ * @param mysqli $link Ресурс соединения
+ * @param integer $id_lot ID лота
+ *
+ * @return string $page_content Шаблон ошибки вставки
+ */
+function set_new_price($bird_sum, $link, $id_lot)
+{
+    $page_content = null;
+    $sql_insert_bids = "INSERT INTO `bids` (`created_at`, `price`, `user_id`, `lot_id`) VALUES (NOW(), ?, ?, ?)";
+    $stmt = db_get_prepare_stmt($link, $sql_insert_bids, [$bird_sum, $_SESSION["user"]["id"], $id_lot]);
+    $result = mysqli_stmt_execute($stmt);
+    if ($result) {
+        header("Location: lot.php?id=" . $id_lot);
+    } else {
+        $page_content = include_template("error.php", [
+            "text_error" => "Ошибка вставки: " . mysqli_errno($link)
+        ]);
+    }
+    return $page_content;
 }

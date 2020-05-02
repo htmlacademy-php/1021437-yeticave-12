@@ -2,7 +2,6 @@
 require_once "functions.php";
 require_once "helpers.php";
 $current_price = get_max_price_bids($bids, $lot["price_start"]);
-//получаем id пользователя последней ставки
 if (isset($bids)) {
     $last_bet = (int)$bids[0]["id"];
 }
@@ -20,7 +19,7 @@ if (isset($bids)) {
             </p>
         </div>
         <div class="lot-item__right">
-            <? #Не показываем при условиях: пользователь не авторизован; срок размещения лота истёк; лот создан текущим пользователем; последняя ставка сделана текущим пользователем.-->?>
+            <? #Не показываем при условиях: пользователь не авторизован; срок размещения лота истёк; лот создан текущим пользователем; последняя ставка сделана текущим пользователем ?>
             <?php if (isset($_SESSION["user"]) && (!get_dt_end($lot["ends_at"])) && ($_SESSION["user"]["id"]) !== (int)$lot["author_id"] && $last_bet !== $_SESSION["user"]["id"]) : ?>
                 <div class="lot-item__state">
                     <?php
