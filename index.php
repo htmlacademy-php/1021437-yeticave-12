@@ -3,11 +3,19 @@ require_once "init.php";
 require_once "helpers.php";
 require_once "get_winner.php";
 
-$sql_lots = "SELECT lot.id, lot.name, lot.price_start, lot.image_link, lot.created_at, lot.ends_at, category.name as category_name FROM `lots` as lot
-INNER JOIN `categories` as category
-ON lot.category_id = category.id
-WHERE lot.ends_at > NOW()
-ORDER BY `created_at` DESC LIMIT " . COUNT_ITEMS;
+$sql_lots = "SELECT 
+    lot.id, 
+    lot.name, 
+    lot.price_start, 
+    lot.image_link, 
+    lot.created_at, 
+    lot.ends_at, 
+    category.name AS category_name 
+    FROM `lots` as lot
+    INNER JOIN `categories` as category
+    ON lot.category_id = category.id
+    WHERE lot.ends_at > NOW()
+    ORDER BY `created_at` DESC LIMIT " . COUNT_ITEMS;
 $result_lots = mysqli_query($con, $sql_lots);
 $lots = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
 

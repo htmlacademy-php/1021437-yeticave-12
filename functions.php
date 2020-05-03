@@ -95,42 +95,52 @@ function check_field($field)
  * Возвращает значение из глобального массива $_POST
  * если оно не пустое или дефолтное значение
  * @param string $name Имя переменной
- * @param string|integer/null $default Дефолтное значение
+ * @param string|integer|null $default Дефолтное значение
  *
  * @return string|integer Текст
  */
 function post_value(string $name, $default = null)
 {
-    if (isset($_POST[$name])) {
-        return $_POST[$name];
-    }
-    return $default;
+    return $_POST[$name] ?? $default;
 }
 
+/**
+ * Возращает значение из глобального массива $_SESSION["user"]
+ * относящегося к массиву с данными о клиенте
+ * @param string $name Имя переменной
+ * @param string|integer|null $default Дефолтное значение
+ *
+ * @return string|null Текст
+ */
 function session_user_value(string $name, $default = null)
 {
-    if (isset($_SESSION["user"][$name])) {
-        return $_SESSION["user"][$name];
-    }
-    return $default;
+    return $_SESSION["user"][$name] ?? $default;
 }
 
-function get_to_integer(string $numb)
-{
-    return (int)$numb;
-}
-
+/**
+ * Возвращает значение из глобального массива $_GET
+ * если оно не пустое или дефолтное значение
+ * @param string $name Имя переменной
+ * @param string|integer|null $default Дефолтное значение
+ *
+ * @return mixed|null Текст
+ */
 function get_value(string $name, $default = null)
 {
-    if (isset($_GET[$name])) {
+    return $_GET[$name] ?? $default;
+}
 
-        switch ($name) {
-            case "page" :
-                return get_to_integer($_GET[$name]);
-        }
-
-    }
-    return $default;
+/**
+ * Получает значение страницы и проверяет
+ * чтобы оно было числом, если нет то
+ * возращает страницу 1
+ *
+ * @return int Номер страницы
+ */
+function get_page_value()
+{
+   $number_page = get_value("page", 1);
+    return is_numeric($number_page) ? (int)$number_page : 1;
 }
 
 /**
@@ -305,26 +315,17 @@ function get_max_price_lot($max_price, $step, $price_start)
 }
 
 /**
- * Записывает значенеи ставки в базу если оно
+ * Записывает значение ставки в базу если оно
  * больше текущей цены или возращает ошибку
- * @param integer $bird_sum Сумма ставки
+ * @param integer $bet_sum Сумма ставки
  * @param mysqli $link Ресурс соединения
  * @param integer $id_lot ID лота
  *
  * @return string $page_content Шаблон ошибки вставки
  */
-function set_new_price($bird_sum, $link, $id_lot)
+function create_bet($bet_sum, $link, $id_lot)
 {
-    $page_content = null;
     $sql_insert_bids = "INSERT INTO `bids` (`created_at`, `price`, `user_id`, `lot_id`) VALUES (NOW(), ?, ?, ?)";
-    $stmt = db_get_prepare_stmt($link, $sql_insert_bids, [$bird_sum, $_SESSION["user"]["id"], $id_lot]);
-    $result = mysqli_stmt_execute($stmt);
-    if ($result) {
-        header("Location: lot.php?id=" . $id_lot);
-    } else {
-        $page_content = include_template("error.php", [
-            "text_error" => "Ошибка вставки: " . mysqli_errno($link)
-        ]);
-    }
-    return $page_content;
+    $stmt = db_get_prepare_stmt($link, $sql_insert_bids, [$bet_sum, $_SESSION["user"]["id"], $id_lot]);
+    return mysqli_stmt_execute($stmt);
 }

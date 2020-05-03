@@ -2,8 +2,13 @@
 require_once "init.php";
 require_once "vendor/autoload.php";
 require_once "helpers.php";
-
-$lots_info = mysqli_query($con, "SELECT `id`, `author_id`, `name` FROM `lots` as lots WHERE lots.ends_at <= NOW() and lots.user_winner_id = 0");
+$lots_info = mysqli_query($con, "SELECT 
+    `id`,
+    `author_id`,
+    `name` 
+    FROM `lots` AS lots 
+    WHERE lots.ends_at <= NOW() 
+    AND lots.user_winner_id = 0");
 
 for ($i = 1; $i <= mysqli_num_rows($lots_info); $i++) {
     $lot = mysqli_fetch_assoc($lots_info);
@@ -17,6 +22,8 @@ for ($i = 1; $i <= mysqli_num_rows($lots_info); $i++) {
         $user_winner = $user_winner["user_id"];
         $user_info = mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM `users` WHERE id = " . $user_winner));
         $update_winner = mysqli_query($con, "UPDATE `lots` SET `user_winner_id` = " . $user_winner . " WHERE id = " . $current_lot);
+        $update_winner ? mysqli_query($con, "COMMIT") : mysqli_query($con, "ROLLBACK");
+
         $transport = new Swift_SmtpTransport(MAIL["host"], MAIL["port"], MAIL["encryption"]);
         $transport->setUsername(MAIL["username"]);
         $transport->setPassword(MAIL["password"]);
@@ -32,10 +39,5 @@ for ($i = 1; $i <= mysqli_num_rows($lots_info); $i++) {
         // Отправка сообщения
         $mailer = new Swift_Mailer($transport);
         $send_mail = $mailer->send($message);
-        if ($send_mail) {
-            mysqli_query($con, "COMMIT");
-        } else {
-            mysqli_query($con, "ROLLBACK");
-        }
     }
 }

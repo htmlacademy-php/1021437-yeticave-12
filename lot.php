@@ -5,17 +5,34 @@ require_once "helpers.php";
 // получение идентификатора с помощью фильтра целое число
 $id_lot = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT);
 // выборка информации о лоте
-$current_lot = "SELECT lot.id, lot.name, lot.step_rate, ends_at, lot.price_start, lot.description, lot.image_link, lot.created_at, lot.author_id, lot.author_id, lot.ends_at, category.name as category_name
-FROM `lots` as lot
-INNER JOIN `categories` as category
-ON lot.category_id = category.id
-WHERE lot.id = '$id_lot'";
+$current_lot = "SELECT 
+    lot.id, 
+    lot.name, 
+    lot.step_rate, 
+    ends_at, 
+    lot.price_start, 
+    lot.description, 
+    lot.image_link, 
+    lot.created_at, 
+    lot.author_id, 
+    lot.author_id, 
+    lot.ends_at,
+     category.name as category_name
+    FROM `lots` AS lot
+    INNER JOIN `categories` AS category
+    ON lot.category_id = category.id
+    WHERE lot.id = '$id_lot'";
 // выборка истории ставок
-$sql_bids = "SELECT users.name, bids.price, bids.created_at, users.id FROM `bids` as bids
-INNER JOIN `users` as users
-ON bids.user_id = users.id
-WHERE `lot_id` = '$id_lot'
-ORDER BY bids.created_at DESC";
+$sql_bids = "SELECT 
+    users.name, 
+    bids.price, 
+    bids.created_at, 
+    users.id 
+    FROM `bids` AS bids
+    INNER JOIN `users` AS users
+    ON bids.user_id = users.id
+    WHERE `lot_id` = '$id_lot'
+    ORDER BY bids.created_at DESC";
 $result_bids = mysqli_query($con, $sql_bids);
 $bids = mysqli_fetch_all($result_bids, MYSQLI_ASSOC);
 
@@ -24,12 +41,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_SESSION["user"])) {
     $bird_sum = get_escape_string($con, $_POST["cost"]);
     $lot = mysqli_fetch_assoc(mysqli_query($con, $current_lot));
     // узнаем есть ли ставки по этому лоту
-    $max_value_bird = mysqli_query($con, "SELECT MAX(price) as `max_price` FROM `bids` WHERE `lot_id` =" . $id_lot . " LIMIT 1");
+    $max_value_bird = mysqli_query($con, "SELECT MAX(price) AS `max_price` FROM `bids` WHERE `lot_id` =" . $id_lot . " LIMIT 1");
     $max_value = mysqli_fetch_assoc($max_value_bird);
     $new_sum = get_max_price_lot($max_value["max_price"], $lot["step_rate"], $lot["price_start"]);
 
     if ($new_sum <= $bird_sum) {
-        $page_content = set_new_price($bird_sum, $con, $id_lot);
+        $page_content = create_bet($bird_sum, $con, $id_lot) ? header("Location: lot.php?id=" . $id_lot) : $page_content = include_template("error.php", [
+            "text_error" => "Ошибка вставки: " . mysqli_errno($con)
+        ]);
     } else {
         $page_content = include_template("current_lot.php", [
             "categories" => $categories,

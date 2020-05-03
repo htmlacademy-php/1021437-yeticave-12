@@ -8,6 +8,8 @@ if (isset($_SESSION['user'])) {
     exit();
 } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
     $errors = [];
+    $email = $_POST["email"];
+    $password = $_POST["password"];
     function validate_email_field($email_field, $link)
     {
         if (empty($email_field)) {
@@ -32,18 +34,18 @@ if (isset($_SESSION['user'])) {
     }
 
     $rules = [
-        "email" => function () use ($con) {
-            return validate_email_field($_POST["email"], $con);
+        "email" => function () use ($con, $email) {
+            return validate_email_field($email, $con);
         },
-        "password" => function () use ($con) {
-            return validate_password_field($_POST["password"], $_POST["email"], $con);
+        "password" => function () use ($con, $email, $password) {
+            return validate_password_field($password, $email, $con);
         }
     ];
 
     $errors = validation_form($_POST, $rules);
 
     if (empty($errors)) {
-        $result = get_data_user($con, $_POST["email"]);
+        $result = get_data_user($con, $email);
         $_SESSION["user"] = $result ? mysqli_fetch_assoc($result) : null;
         header("Location: index.php");
         exit();
