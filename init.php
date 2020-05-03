@@ -2,11 +2,19 @@
 session_start();
 
 define("DB_USER", "root");
-define("DB_PASSWORD", "9ZOYcLpeEb8y1Zmr");
+define("DB_PASSWORD", "147456");
 define("PATH_UPLOADS_IMAGE", "uploads/");
 define("DB_HOST", "localhost");
 define("DB_NAME", "1021437-yeticave-12");
 define("COUNT_ITEMS", "9");
+define("MAIL", [
+    "host" => "smtp.mailtrap.io",
+    "port" => 2525,
+    "encryption" => "tls",
+    "username" => "913ac37e38ecd8",
+    "password" => "64542b20aea49b",
+
+]);
 
 date_default_timezone_set("Europe/Moscow");
 

@@ -9,12 +9,15 @@ if (isset($_SESSION["user"])) {
         "code_error" => "403",
         "text_error" => "Страница для незарегистрированных пользователей"
     ]);
-} else if ($_SERVER["REQUEST_METHOD"] === "POST") {
+} elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
     $errors = [];
-
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+    $name = $_POST["name"];
+    $message = $_POST["message"];
     function validate_field_email($email_field, $link)
     {
-        if(filter_var($email_field, FILTER_VALIDATE_EMAIL)) {
+        if (filter_var($email_field, FILTER_VALIDATE_EMAIL)) {
             $email = mysqli_real_escape_string($link, $email_field);
             $sql_query_empty_user = "SELECT `id` FROM users WHERE `email` = ?";
             $stmt = db_get_prepare_stmt($link, $sql_query_empty_user, [$email]);
@@ -28,31 +31,36 @@ if (isset($_SESSION["user"])) {
     }
 
     $rules = [
-        "email" => function() use ($con) {
-            return validate_field_email($_POST["email"], $con);
+        "email" => function () use ($con, $email) {
+            return validate_field_email($email, $con);
         },
-        "password" => function() {
-            return check_field($_POST["password"]);
+        "password" => function () use ($password) {
+            return check_field($password);
         },
-        "name" => function() {
-            return check_field($_POST["name"]);
+        "name" => function () use ($name) {
+            return check_field($name);
         },
-        "message" => function() {
-            return check_field($_POST["message"]);
+        "message" => function () use ($message) {
+            return check_field($message);
         }
     ];
 
     $errors = validation_form($_POST, $rules);
 
-    if(empty($errors)) {
+    if (empty($errors)) {
         //шифруем пароль
-        $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
-        $query_insert_database_user = "INSERT INTO `users` (`registration_at`, `email`, `name`, `password`, `users_info`)
-VALUES
-(NOW(), ?, ?, ?, ?)";
-        $stmt = db_get_prepare_stmt($con, $query_insert_database_user, [$_POST["email"], $_POST["name"], $password, $_POST["message"]]);
+        $password = password_hash($password, PASSWORD_DEFAULT);
+        $query_insert_database_user = "INSERT INTO `users`(
+            `registration_at`,
+            `email`,
+            `name`,
+            `password`,
+            `users_info`
+        )
+        VALUES(NOW(), ?, ?, ?, ?)";
+        $stmt = db_get_prepare_stmt($con, $query_insert_database_user, [$email, $name, $password, $message]);
         $result = mysqli_stmt_execute($stmt);
-        if($result) {
+        if ($result) {
             header("location: login.php");
             exit();
         } else {
@@ -70,9 +78,8 @@ VALUES
 $layout_content = include_template("layout.php", [
     "main_content" => $page_content,
     "title_page" => "Страница регистрации",
-    "user_name" => $_SESSION["user"]["name"] ?? '',
+    "user_name" => session_user_value("name", ""),
     "categories" => $categories,
 ]);
 
 print($layout_content);
-
