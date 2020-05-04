@@ -12,6 +12,7 @@
     "minimum-stability": "stable",
     "require": {
         "swiftmailer/swiftmailer": "^6.2",
-        "imagine/imagine": "^1.2"
+        "imagine/imagine": "^1.2",
+        "ext-gd": "*"
     }
 }

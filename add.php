@@ -107,16 +107,9 @@ if (!isset($_SESSION["user"])) {
             $bottomRight = new Imagine\Image\Point($size->getWidth() - $wSize->getWidth(), $size->getHeight() - $wSize->getHeight());
             $img->paste($watermark, $bottomRight);
             /**
-             * Параметры сжатия изображения
-             */
-            $option_image = array(
-                "jpeg_quality" => 60,
-                "png_compression_level" => 7,
-            );
-            /**
              * Сохранение изображения
              */
-            $img->save(PATH_UPLOADS_IMAGE . $file_name, $option_image);
+            $img->save(PATH_UPLOADS_IMAGE . $file_name, IMAGE_QUALITY);
         }
     }
 
