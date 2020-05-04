@@ -1,6 +1,8 @@
 <?php
 require_once "init.php";
 require_once "helpers.php";
+require_once "vendor/autoload.php";
+use Imagine\Image\Box;
 
 if (!isset($_SESSION["user"])) {
     http_response_code(403);
@@ -90,6 +92,24 @@ if (!isset($_SESSION["user"])) {
             if ($_FILES["lot-img"]["error"] !== UPLOAD_ERR_OK) {
                 return "Ошибка при загрузке файла - код ошибки: " . $_FILES["lot-img"]["error"];
             }
+            /**
+             * Обрезаем картинку лота
+             */
+            $imagine = new Imagine\Gd\Imagine();
+            $img = $imagine->open(PATH_UPLOADS_IMAGE . $file_name);
+            $img->resize(new Box(IMAGE_PARAMETERS["width"], IMAGE_PARAMETERS["height"]));
+            /**
+             * Добавляем watermark
+             */
+            $watermark = $imagine->open('img/logo.png');
+            $size = $img->getSize();
+            $wSize = $watermark->getSize();
+            $bottomRight = new Imagine\Image\Point($size->getWidth() - $wSize->getWidth(), $size->getHeight() - $wSize->getHeight());
+            $img->paste($watermark, $bottomRight);
+            /**
+             * Сохранение изображения
+             */
+            $img->save(PATH_UPLOADS_IMAGE . $file_name, IMAGE_QUALITY);
         }
     }
 

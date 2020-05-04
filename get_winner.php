@@ -34,6 +34,7 @@ for ($i = 1; $i <= mysqli_num_rows($lots_info); $i++) {
             "user" => $user_info,
             "lot_id" => $current_lot,
             "lot_name" => $lot_name,
+            "host_project" => $_SERVER["HTTP_HOST"],
         ]);
         $message->setBody($msg_content, 'text/html');
         // Отправка сообщения
