@@ -15,6 +15,10 @@ define("MAIL", [
     "password" => "64542b20aea49b",
 
 ]);
+define("IMAGE_PARAMETERS", [
+   "width" => 800,
+    "height" => 600,
+]);
 
 date_default_timezone_set("Europe/Moscow");
 
