@@ -10,55 +10,61 @@ if (isset($_SESSION['user'])) {
     $errors = [];
     $email = $_POST["email"];
     $password = $_POST["password"];
-    function validate_email_field($email_field, $link)
+
+    function email_availability($link)
     {
-        if (empty($email_field)) {
-            return "Это поле обязательно к заполнению";
-        }
-        $result = get_data_user($link, $email_field);
-        if (mysqli_num_rows($result) === 0) {
-            return "Нет пользователя с таким адресом";
-        }
+        return function ($value) use ($link): ? string {
+            $result = get_data_user($link, $value);
+            return mysqli_num_rows($result) === 0 ?  "Нет пользователя с таким адресом" : null;
+        };
     }
 
-    function validate_password_field($password_field, $email_field, $link)
+    function not_empty(): callable
     {
-        if (empty($password_field)) {
-            return "Это поле обязательно к заполнению";
-        }
-        $result = get_data_user($link, $email_field);
-        $user_data = $result ? mysqli_fetch_assoc($result) : null;
-        if (!password_verify($password_field, $user_data["password"])) {
-            return "Указан неверный пароль";
-        }
+        return function ($value): ? string {
+            return empty($value) ? "Это поле обязательно к заполнению" : null;
+        };
     }
 
-//    $rules = [
-//        "email" => function () use ($con, $email) {
-//            return validate_email_field($email, $con);
-//        },
-//        "password" => function () use ($con, $email, $password) {
-//            return validate_password_field($password, $email, $con);
-//        }
-//    ];
-//
-//    $errors = validation_form($_POST, $rules);
-
-    function validation_new_form($data, $route_rules, $link)
+    function password_correct($link, $email) : callable
     {
-        require_once "functions.php";
+        return function ($value) use ($link, $email): ? string {
+            $result = get_data_user($link, $email);
+            $user_data = $result ? mysqli_fetch_assoc($result) : null;
+            return (!password_verify($value, $user_data["password"])) ? "Указан неверный пароль" : null;
+        };
+    }
+
+    function validate(array $data, array $schema): array
+    {
         $errors = [];
-        foreach ($route_rules as $key => $value) {
-            $errors[$key] = $value;
+        foreach ($schema as $field => $rules) {
+            foreach ($rules as $rule) {
+                if(!isset($errors[$field])) {
+                    $errors[$field] = $rule($data[$field] ?? null);
+                }
+
+            }
         }
-//        $errors = array_filter($errors);
-        return $errors;
+        return array_filter($errors);
     }
 
-    $errors = validation_new_form($_POST, [
-        "email" => [check_field($_POST["email"]), validate_email_field($_POST["email"], $con)],
-        "password" => check_field($_POST["password"]),
-    ], $con);
+    $errors = validate(
+        [
+            'email' => post_value('email'),
+            'password' => post_value('password'),
+        ],
+        [
+            'email' => [
+                not_empty(),
+                email_availability($con),
+            ],
+            'password' => [
+                not_empty(),
+                password_correct($con, $email),
+            ],
+        ]
+    );
 
     if (empty($errors)) {
         $result = get_data_user($con, $email);
