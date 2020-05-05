@@ -33,16 +33,32 @@ if (isset($_SESSION['user'])) {
         }
     }
 
-    $rules = [
-        "email" => function () use ($con, $email) {
-            return validate_email_field($email, $con);
-        },
-        "password" => function () use ($con, $email, $password) {
-            return validate_password_field($password, $email, $con);
-        }
-    ];
+//    $rules = [
+//        "email" => function () use ($con, $email) {
+//            return validate_email_field($email, $con);
+//        },
+//        "password" => function () use ($con, $email, $password) {
+//            return validate_password_field($password, $email, $con);
+//        }
+//    ];
+//
+//    $errors = validation_form($_POST, $rules);
 
-    $errors = validation_form($_POST, $rules);
+    function validation_new_form($data, $route_rules, $link)
+    {
+        require_once "functions.php";
+        $errors = [];
+        foreach ($route_rules as $key => $value) {
+            $errors[$key] = $value;
+        }
+//        $errors = array_filter($errors);
+        return $errors;
+    }
+
+    $errors = validation_new_form($_POST, [
+        "email" => [check_field($_POST["email"]), validate_email_field($_POST["email"], $con)],
+        "password" => check_field($_POST["password"]),
+    ], $con);
 
     if (empty($errors)) {
         $result = get_data_user($con, $email);
