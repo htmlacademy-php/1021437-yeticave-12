@@ -8,21 +8,28 @@ if (isset($_SESSION['user'])) {
     exit();
 } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
     $errors = [];
-    $email = $_POST["email"];
-    $password = $_POST["password"];
-
-    function email_availability($link)
-    {
-        return function ($value) use ($link): ? string {
-            $result = get_data_user($link, $value);
-            return mysqli_num_rows($result) === 0 ?  "Нет пользователя с таким адресом" : null;
-        };
-    }
+    $email = post_value('email');
+    $password = post_value('password');
 
     function not_empty(): callable
     {
         return function ($value): ? string {
             return empty($value) ? "Это поле обязательно к заполнению" : null;
+        };
+    }
+
+    function unique(string $table, string $field, string $text, $link): callable
+    {
+        return function ($value) use ($table, $field, $text, $link): ? string {
+            $table = get_escape_string($link, $table);
+            $field = get_escape_string($link, $field);
+            $text = get_escape_string($link, $text);
+            $sql = sprintf('SELECT count(id) AS count FROM `%s` WHERE `%s` = ?', $table, $field);
+            $stmt = db_get_prepare_stmt($link, $sql, [$value]);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            $email = mysqli_fetch_assoc($result);
+            return $email["count"] !== 1 ? $text : null;
         };
     }
 
@@ -43,7 +50,6 @@ if (isset($_SESSION['user'])) {
                 if(!isset($errors[$field])) {
                     $errors[$field] = $rule($data[$field] ?? null);
                 }
-
             }
         }
         return array_filter($errors);
@@ -51,13 +57,13 @@ if (isset($_SESSION['user'])) {
 
     $errors = validate(
         [
-            'email' => post_value('email'),
-            'password' => post_value('password'),
+            'email' => $email,
+            'password' => $password,
         ],
         [
             'email' => [
                 not_empty(),
-                email_availability($con),
+                unique("users", "email", "Такого пользователя нету", $con),
             ],
             'password' => [
                 not_empty(),
