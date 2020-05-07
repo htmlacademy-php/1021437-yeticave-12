@@ -7,19 +7,31 @@ function not_empty(): callable
     };
 }
 
-function unique(string $table, string $field, string $text, int $flag, $link): callable
+function check_unique_value(string $table, string $field, string $text, $link): callable
 {
-    return function ($value) use ($table, $field, $text, $flag, $link): ? string {
-        $table = get_escape_string($link, $table);
-        $field = get_escape_string($link, $field);
-        $text = get_escape_string($link, $text);
-        $flag = (int)get_escape_string($link, $flag);
-        $sql = sprintf('SELECT count(id) AS count FROM `%s` WHERE `%s` = ?', $table, $field);
-        $stmt = db_get_prepare_stmt($link, $sql, [$value]);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-        $email = mysqli_fetch_assoc($result);
-        return $email["count"] === $flag ? $text : null;
+    return function ($value) use ($table, $field, $text, $link): ? string {
+        list($email, $text) = value_search($table, $field, $text, $value, $link);
+        return $email["count"] !== 1 ? $text : null;
+    };
+}
+
+function value_search(string $table, string $field, $text, $value,  $link)
+{
+    $table = get_escape_string($link, $table);
+    $field = get_escape_string($link, $field);
+    $text = get_escape_string($link, $text);
+    $sql = sprintf('SELECT count(id) AS count FROM `%s` WHERE `%s` = ?', $table, $field);
+    $stmt = db_get_prepare_stmt($link, $sql, [$value]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    return [mysqli_fetch_assoc($result), $text];
+}
+
+function is_set_value_on_db(string $table, string $field, string $text, $link): callable
+{
+    return function ($value) use ($table, $field, $text, $link): ? string {
+        list($email, $text) = value_search($table, $field, $text, $value, $link);
+        return $email["count"] === 1 ? $text : null;
     };
 }
 

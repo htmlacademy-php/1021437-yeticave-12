@@ -19,7 +19,7 @@ if (isset($_SESSION['user'])) {
         [
             'email' => [
                 not_empty(),
-                unique("users", "email", "Такого пользователя нету", 0, $con),
+                check_unique_value("users", "email", "Такого пользователя нету", $con),
             ],
             'password' => [
                 not_empty(),

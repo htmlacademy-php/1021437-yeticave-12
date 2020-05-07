@@ -27,7 +27,7 @@ if (isset($_SESSION["user"])) {
         [
             'email' => [
                 not_empty(),
-                unique("users", "email", "Пользователь с этим email уже зарегистрирован", 1, $con)
+                is_set_value_on_db("users", "email", "Пользователь с этим email уже зарегистрирован", $con)
             ],
             'password' => [
                 not_empty(),
