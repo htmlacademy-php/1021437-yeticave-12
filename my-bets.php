@@ -9,7 +9,7 @@ if (isset($_SESSION["user"])) {
         $_SESSION["user"]["id"]
     );
     $current_page = get_page_value();
-    $offset = get_offset_items($current_page,COUNT_ITEMS);
+    $offset = get_offset_items($current_page, COUNT_ITEMS);
     $current_id = get_escape_string($con, $_SESSION["user"]["id"]);
     $result_bids = mysqli_query(
         $con,

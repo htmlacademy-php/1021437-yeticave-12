@@ -1,6 +1,7 @@
 <?php
 require_once "init.php";
 require_once "helpers.php";
+require_once "validate_functions.php";
 require_once "vendor/autoload.php";
 use Imagine\Image\Box;
 
@@ -13,71 +14,49 @@ if (!isset($_SESSION["user"])) {
     ]);
 } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
     $errors = [];
-    // функция проверки полей: lot-name, message
-    function validate_field_text($field_text, $max = null)
-    {
-        if ($max && mb_strlen($field_text) > $max) {
-            return "Значение должно быть не более $max символов";
-        }
-        return check_field($field_text);
-    }
+    $lot_name = post_value("lot-name");
+    $message = post_value("message");
+    $lot_rate = post_value("lot-rate");
+    $category = post_value("category");
+    $lot_step = post_value("lot-step");
+    $lot_date = post_value("lot-date");
 
-    // функция проверки начальной цены и шага ставки
-    function validate_field_price($field_price)
-    {
-        if (!is_numeric($field_price)) {
-            return "Можно вводить только число";
-        }
-        $price = number_format($field_price, 2, ".", ",");
-        if ($price <= 0) {
-            return "Введите число больше нуля";
-        }
-        return check_field($field_price);
-    }
-
-    // функция проверки выбора категории
-    function validate_field_category($field_category)
-    {
-        return check_field($field_category);
-    }
-
-    // функция проверки даты
-    function validate_field_date($field_date)
-    {
-        $format_to_check = "Y-m-d";
-        $dateTimeObj = date_create_from_format($format_to_check, $field_date);
-        if ($dateTimeObj) {
-            $diff_in_hours = floor((strtotime($field_date) - strtotime("now")) / 3600);
-            if ($diff_in_hours <= 24) {
-                return "Дата заверешния торгов, не может быть меньше 24 часов или отрицательной";
-            }
-        }
-        return check_field($field_date);
-    }
-
-    //правила проверок
-    $rules = [
-        "lot-name" => function () {
-            return validate_field_text($_POST["lot-name"], 255);
-        },
-        "message" => function () {
-            return validate_field_text($_POST["message"]);
-        },
-        "lot-rate" => function () {
-            return validate_field_price($_POST["lot-rate"]);
-        },
-        "category" => function () {
-            return validate_field_category($_POST["category"]);
-        },
-        "lot-step" => function () {
-            return validate_field_price($_POST["lot-step"]);
-        },
-        "lot-date" => function () {
-            return validate_field_date($_POST["lot-date"]);
-        }
-    ];
-
-    $errors = validation_form($_POST, $rules);
+    $errors = validate(
+        [
+            "lot-name" => $lot_name,
+            "message" => $message,
+            "lot-rate" => $lot_rate,
+            "category" => $category,
+            "lot-step" => $lot_step,
+            "lot-date" => $lot_date,
+        ],
+        [
+            "lot-name" => [
+                not_empty(),
+                validate_field_text(255),
+            ],
+            "message" => [
+                not_empty(),
+            ],
+            "lot-rate" => [
+                not_empty(),
+                it_is_number(),
+                validate_field_price(),
+            ],
+            "category" => [
+                not_empty(),
+            ],
+            "lot-step" => [
+                not_empty(),
+                it_is_number(),
+                validate_field_price(),
+            ],
+            "lot-date" => [
+                not_empty(),
+                validate_field_date(),
+            ],
+        ]
+    );
 
     if (empty($_FILES["lot-img"]["name"])) {
         $errors["lot-img"] = "Файл обязателен для загрузки";

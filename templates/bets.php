@@ -57,12 +57,9 @@ require_once "functions.php";
 
                     <td class="rates__time">
                         <?php if ($hours === 0) : ?>
-                        <?= $minutes . " " . get_noun_plural_form($minutes, 'минута', 'минуты',
-                            'минут') . " назад" ?></td>
+                        <?= $minutes . " " . get_noun_plural_form($minutes, 'минута', 'минуты', 'минут') . " назад" ?></td>
                 <? else : ?>
-                    <?= $hours . " " . get_noun_plural_form($hours, 'часа', 'часа',
-                    'часов') . " " . $minutes . " " . get_noun_plural_form($minutes, 'минута', 'минуты',
-                    'минут') . " назад" ?></td>
+                    <?= $hours . " " . get_noun_plural_form($hours, 'часа', 'часа', 'часов') . " " . $minutes . " " . get_noun_plural_form($minutes, 'минута', 'минуты', 'минут') . " назад" ?></td>
                 <? endif; ?>
                     </td>
                 </tr>

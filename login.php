@@ -3,25 +3,25 @@ require_once "init.php";
 require_once "helpers.php";
 require_once "validate_functions.php";
 
-if (isset($_SESSION['user'])) {
+if (isset($_SESSION["user"])) {
     header("Location: index.php");
     exit();
 } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
     $errors = [];
-    $email = post_value('email');
-    $password = post_value('password');
+    $email = post_value("email");
+    $password = post_value("password");
 
     $errors = validate(
         [
-            'email' => $email,
-            'password' => $password,
+            "email" => $email,
+            "password" => $password,
         ],
         [
-            'email' => [
+            "email" => [
                 not_empty(),
                 check_unique_value("users", "email", "Такого пользователя нету", $con),
             ],
-            'password' => [
+            "password" => [
                 not_empty(),
                 password_correct($con, $email),
             ],

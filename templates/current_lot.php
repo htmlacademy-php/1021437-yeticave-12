@@ -26,9 +26,7 @@ if (isset($bids)) {
                     list($hours, $minutes) = get_dt_range($lot["ends_at"]);
                     ?>
                     <div class="lot-item__timer timer <?php if ($hours < 1) : ?>timer--finishing<?php endif; ?>">
-                        <?php
-                        echo $hours . ":" . $minutes;
-                        ?>
+                        <?= $hours . ":" . $minutes; ?>
                     </div>
                     <div class="lot-item__cost-state">
                         <div class="lot-item__rate">
@@ -59,12 +57,9 @@ if (isset($bids)) {
                             <td class="history__price"><?= format_sum($bid["price"]) ?></td>
                             <?php list($hours, $minutes) = get_dt_difference($bid["created_at"]); ?>
                             <?php if ($hours === 0) : ?>
-                                <td class="history__time"><?= $minutes . " " . get_noun_plural_form($minutes, 'минута',
-                                        'минуты', 'минут') . " назад" ?></td>
+                                <td class="history__time"><?= $minutes . " " . get_noun_plural_form($minutes, 'минута', 'минуты', 'минут') . " назад" ?></td>
                             <? else : ?>
-                                <td class="history__time"><?= $hours . " " . get_noun_plural_form($hours, 'часа',
-                                        'часа', 'часов') . " " . $minutes . " " . get_noun_plural_form($minutes,
-                                        'минута', 'минуты', 'минут') . " назад" ?></td>
+                                <td class="history__time"><?= $hours . " " . get_noun_plural_form($hours, 'часа', 'часа', 'часов') . " " . $minutes . " " . get_noun_plural_form($minutes, 'минута', 'минуты', 'минут') . " назад" ?></td>
                             <? endif; ?>
                         </tr>
                     <?php endforeach; ?>

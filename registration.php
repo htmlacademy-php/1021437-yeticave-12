@@ -19,23 +19,23 @@ if (isset($_SESSION["user"])) {
 
     $errors = validate(
         [
-            'email' => $email,
-            'password' => $password,
+            "email" => $email,
+            "password" => $password,
             "name" => $name,
             "message" => $message,
         ],
         [
-            'email' => [
+            "email" => [
                 not_empty(),
-                is_set_value_on_db("users", "email", "Пользователь с этим email уже зарегистрирован", $con)
+                db_exists("users", "email", "Пользователь с этим email уже зарегистрирован", $con)
             ],
-            'password' => [
-                not_empty(),
-            ],
-            'name' => [
+            "password" => [
                 not_empty(),
             ],
-            'message' => [
+            "name" => [
+                not_empty(),
+            ],
+            "message" => [
                 not_empty(),
             ],
         ]
@@ -43,7 +43,6 @@ if (isset($_SESSION["user"])) {
 
 
     if (empty($errors)) {
-        //шифруем пароль
         $password = password_hash($password, PASSWORD_DEFAULT);
         $query_insert_database_user = "INSERT INTO `users`(
             `registration_at`,

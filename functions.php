@@ -79,19 +79,6 @@ function get_max_price_bids($prices, $price_start)
 }
 
 /**
- * Возвращает ошибку, если поле пустое
- * @param string $field Поле с текстом
- *
- * @return string Комментарий
- */
-function check_field($field)
-{
-    if (empty($field)) {
-        return "Это поле обязательно к заполнению";
-    }
-}
-
-/**
  * Возвращает значение из глобального массива $_POST
  * если оно не пустое или дефолтное значение
  * @param string $name Имя переменной
@@ -139,29 +126,8 @@ function get_value(string $name, $default = null)
  */
 function get_page_value()
 {
-   $number_page = get_value("page", 1);
+    $number_page = get_value("page", 1);
     return is_numeric($number_page) ? (int)$number_page : 1;
-}
-
-/**
- * Обработка правил валидации для
- * различных входных данных
- * @param array $data Данные для валидации
- * @param array $rules Перечень правил для валидации
- *
- * @return array Массив с ошибками
- */
-function validation_form($data, $rules)
-{
-    $errors = [];
-    foreach ($data as $key => $value) {
-        if (isset($rules[$key])) {
-            $rule = $rules[$key];
-            $errors[$key] = $rule();
-        }
-    }
-    $errors = array_filter($errors);
-    return $errors;
 }
 
 /**
@@ -204,8 +170,7 @@ function render_pagination_button(
         $disable = "style='pointer-events: none;'";
     }
     $string_template = '<li %s class="pagination-item %s"><a href="%s%s&page=%d">%s</a></li>';
-    return sprintf($string_template, $disable, $class_important, $path_button, $text_search, $current_page,
-        $text_button);
+    return sprintf($string_template, $disable, $class_important, $path_button, $text_search, $current_page, $text_button);
 }
 
 /**
@@ -240,8 +205,7 @@ function render_pagination($all_lots, $value_items, $current_page, $pages, $str_
         }
 
         if ($pages > $current_page) {
-            $pagination .= render_pagination_button($path_search, "Вперед", "pagination-item-next", false, $str_search,
-                $current_page + 1);
+            $pagination .= render_pagination_button($path_search, "Вперед", "pagination-item-next", false, $str_search, $current_page + 1);
         } else {
             $pagination .= render_pagination_button("#", "Вперед", "pagination-item-next", true);
         }

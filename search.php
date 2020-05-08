@@ -12,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
             $str_search
         );
         $current_page = get_page_value();
-        $offset = get_offset_items($current_page,COUNT_ITEMS);
+        $offset = get_offset_items($current_page, COUNT_ITEMS);
         // информация по лотам на странице в количестве 9 штук и со смещением
         $query_search_lot = "SELECT 
             lots.*, 

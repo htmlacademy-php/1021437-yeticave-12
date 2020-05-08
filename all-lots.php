@@ -14,7 +14,7 @@ if (isset($_GET["category"]) && $_GET["category"] !== "") {
         $_GET["category"]
     );
     $current_page = get_page_value();
-    $offset = get_offset_items($current_page,COUNT_ITEMS);
+    $offset = get_offset_items($current_page, COUNT_ITEMS);
     $current_category = get_escape_string($con, $_GET["category"]);
     $sql_query_lots_category = "SELECT
         lots.id, 

@@ -32,7 +32,6 @@ require_once "functions.php";
                 <? endforeach; ?>
             </ul>
         </section>
-        <?php echo render_pagination($count_lots, COUNT_ITEMS, $current_page, $page_count, $str_search,
-            "search.php?search=") ?>
+        <?php echo render_pagination($count_lots, COUNT_ITEMS, $current_page, $page_count, $str_search, "search.php?search=") ?>
     <? endif; ?>
 </div>
