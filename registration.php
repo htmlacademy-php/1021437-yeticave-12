@@ -27,6 +27,7 @@ if (isset($_SESSION["user"])) {
         [
             "email" => [
                 not_empty(),
+                checking_correct_email(),
                 db_exists("users", "email", "Пользователь с этим email уже зарегистрирован", $con)
             ],
             "password" => [

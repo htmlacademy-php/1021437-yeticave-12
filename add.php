@@ -3,7 +3,6 @@ require_once "init.php";
 require_once "helpers.php";
 require_once "validate_functions.php";
 require_once "vendor/autoload.php";
-use Imagine\Image\Box;
 
 if (!isset($_SESSION["user"])) {
     http_response_code(403);
@@ -20,6 +19,8 @@ if (!isset($_SESSION["user"])) {
     $category = post_value("category");
     $lot_step = post_value("lot-step");
     $lot_date = post_value("lot-date");
+    $lot_img = file_image("lot-img", "");
+    $id_image = uniqid();
 
     $errors = validate(
         [
@@ -29,11 +30,12 @@ if (!isset($_SESSION["user"])) {
             "category" => $category,
             "lot-step" => $lot_step,
             "lot-date" => $lot_date,
+            "lot-img" => $lot_img,
         ],
         [
             "lot-name" => [
                 not_empty(),
-                validate_field_text(255),
+                check_max_length_text_field(255),
             ],
             "message" => [
                 not_empty(),
@@ -41,7 +43,7 @@ if (!isset($_SESSION["user"])) {
             "lot-rate" => [
                 not_empty(),
                 it_is_number(),
-                validate_field_price(),
+                checking_text_on_number_text_field(),
             ],
             "category" => [
                 not_empty(),
@@ -49,48 +51,19 @@ if (!isset($_SESSION["user"])) {
             "lot-step" => [
                 not_empty(),
                 it_is_number(),
-                validate_field_price(),
+                checking_text_on_number_text_field(),
             ],
             "lot-date" => [
                 not_empty(),
-                validate_field_date(),
+                checking_date_on_format_and_date_lot_end(),
             ],
+            "lot-img" => [
+                checking_add_image(),
+                checking_type_image(),
+                add_image_to_lots_and_image_processing($id_image),
+            ]
         ]
     );
-
-    if (empty($_FILES["lot-img"]["name"])) {
-        $errors["lot-img"] = "Файл обязателен для загрузки";
-    } else {
-        $id_image = uniqid();
-        $file_name = $id_image . $_FILES["lot-img"]["name"];
-        $type_file = mime_content_type($_FILES["lot-img"]["tmp_name"]);
-        if ($type_file !== "image/jpeg" && $type_file !== "image/png") {
-            $errors["lot-img"] = "Поддерживается загрузка только png, jpg, jpeg " . $type_file;
-        } else {
-            move_uploaded_file($_FILES["lot-img"]["tmp_name"], PATH_UPLOADS_IMAGE . $file_name);
-            if ($_FILES["lot-img"]["error"] !== UPLOAD_ERR_OK) {
-                return "Ошибка при загрузке файла - код ошибки: " . $_FILES["lot-img"]["error"];
-            }
-            /**
-             * Обрезаем картинку лота
-             */
-            $imagine = new Imagine\Gd\Imagine();
-            $img = $imagine->open(PATH_UPLOADS_IMAGE . $file_name);
-            $img->resize(new Box(IMAGE_PARAMETERS["width"], IMAGE_PARAMETERS["height"]));
-            /**
-             * Добавляем watermark
-             */
-            $watermark = $imagine->open('img/logo.png');
-            $size = $img->getSize();
-            $wSize = $watermark->getSize();
-            $bottomRight = new Imagine\Image\Point($size->getWidth() - $wSize->getWidth(), $size->getHeight() - $wSize->getHeight());
-            $img->paste($watermark, $bottomRight);
-            /**
-             * Сохранение изображения
-             */
-            $img->save(PATH_UPLOADS_IMAGE . $file_name, IMAGE_QUALITY);
-        }
-    }
 
     //если ошибок нету
     if (!count($errors)) {

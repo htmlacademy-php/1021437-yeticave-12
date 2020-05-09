@@ -1,5 +1,7 @@
 <?php
 
+use Imagine\Image\Box;
+
 /**
  * Проверяет на установке значения или
  * возращает ошибку
@@ -97,7 +99,7 @@ function password_correct($link, $email) : callable
  *
  * @return callable
  */
-function validate_field_text($max = null) : callable
+function check_max_length_text_field($max = null) : callable
 {
     return function ($value) use ($max): ? string {
         return $max && mb_strlen($value) > $max ? "Значение должно быть не более $max символов" : "";
@@ -121,11 +123,24 @@ function it_is_number() : callable
  *
  * @return callable
  */
-function validate_field_price() : callable
+function checking_text_on_number_text_field() : callable
 {
     return function ($value) : ? string {
         $price = number_format($value, 2, ".", ",");
         return $price <= 0 ?  "Введите число больше нуля" : "";
+    };
+}
+
+/**
+ * Проверка что поле
+ * является корректным e-mail
+ *
+ * @return callable
+ */
+function checking_correct_email() : callable
+{
+    return function ($value) : ? string {
+        return !filter_var($value, FILTER_VALIDATE_EMAIL) ? "Поле с адресом не является корректным" : "";
     };
 }
 
@@ -135,7 +150,7 @@ function validate_field_price() : callable
  *
  * @return callable
  */
-function validate_field_date() : callable
+function checking_date_on_format_and_date_lot_end() : callable
 {
     return function ($value) : ? string {
         $format_to_check = "Y-m-d";
@@ -145,6 +160,69 @@ function validate_field_date() : callable
             return $diff_in_hours <= 24 ? "Дата заверешния торгов, не может быть меньше 24 часов или отрицательной" : "";
         }
         return "Не верный формат времени";
+    };
+}
+
+/**
+ * Возращаем ошибку если файл не добавили
+ *
+ * @return callable
+ */
+function checking_add_image() : callable {
+    return function ($image): ? string {
+        return empty($image["name"]) ? "Файл обязателен для загрузки" : null;
+    };
+}
+
+/**
+ * Проверка корректности тпиа загруженного изображения
+ *
+ * @return callable
+ */
+function checking_type_image() : callable {
+    return function ($image) : ? string {
+        $type_file = mime_content_type($image["tmp_name"]);
+        return ($type_file !== "image/jpeg" && $type_file !== "image/png") ? "Поддерживается загрузка только png, jpg, jpeg" : null;
+    };
+}
+
+/**
+ * Обработка фотографии (изменения размера и
+ * добавление знака нашей площадки внизу изображения)
+ * @param string $file_name Имя файла
+ */
+function resize_and_watermark_image_of_lot($file_name) {
+    /**
+     * Обрезаем картинку лота
+     */
+    $imagine = new Imagine\Gd\Imagine();
+    $img = $imagine->open(PATH_UPLOADS_IMAGE . $file_name);
+    $img->resize(new Box(IMAGE_PARAMETERS["width"], IMAGE_PARAMETERS["height"]));
+    /**
+     * Добавляем watermark
+     */
+    $watermark = $imagine->open('img/logo.png');
+    $size = $img->getSize();
+    $wSize = $watermark->getSize();
+    $bottomRight = new Imagine\Image\Point($size->getWidth() - $wSize->getWidth(), $size->getHeight() - $wSize->getHeight());
+    $img->paste($watermark, $bottomRight);
+    /**
+     * Сохранение изображения
+     */
+    $img->save(PATH_UPLOADS_IMAGE . $file_name, IMAGE_QUALITY);
+}
+
+/**
+ * Загрузка изображения и добавление обработки фототграфии
+ * @param string/int $id_image Уникальный номер
+ *
+ * @return callable
+ */
+function add_image_to_lots_and_image_processing($id_image) : callable {
+    return function ($image) use ($id_image) {
+        $file_name = $id_image . $image["name"];
+        move_uploaded_file($image["tmp_name"], PATH_UPLOADS_IMAGE . $file_name);
+        return $image["error"] !== UPLOAD_ERR_OK  ? "Ошибка при загрузке файла - код ошибки: " . $image["error"] : resize_and_watermark_image_of_lot($file_name);
     };
 }
 

@@ -92,6 +92,19 @@ function post_value(string $name, $default = null)
 }
 
 /**
+ * Возвращает объект из глобального массива $_FILES
+ * если оно не пустое или дефолтное значение
+ * @param string $name Имя переменной
+ * @param null $default Дефолтное значение
+ *
+ * @return string|null Текст
+ */
+function file_image(string $name, $default = null)
+{
+    return $_FILES[$name] ?? $default;
+}
+
+/**
  * Возращает значение из глобального массива $_SESSION["user"]
  * относящегося к массиву с данными о клиенте
  * @param string $name Имя переменной
