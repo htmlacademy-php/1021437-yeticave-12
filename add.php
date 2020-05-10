@@ -19,7 +19,8 @@ if (!isset($_SESSION["user"])) {
     $category = post_value("category");
     $lot_step = post_value("lot-step");
     $lot_date = post_value("lot-date");
-    $lot_img = file_image("lot-img", "");
+    $lot_img = get_file("lot-img", "");
+    $author_id = session_user_value("id");
     $id_image = uniqid();
 
     $errors = validate(
@@ -35,7 +36,7 @@ if (!isset($_SESSION["user"])) {
         [
             "lot-name" => [
                 not_empty(),
-                check_max_length_text_field(255),
+                str_length_gt(255),
             ],
             "message" => [
                 not_empty(),
@@ -43,7 +44,7 @@ if (!isset($_SESSION["user"])) {
             "lot-rate" => [
                 not_empty(),
                 it_is_number(),
-                checking_text_on_number_text_field(),
+                check_price_greater_than_zero(),
             ],
             "category" => [
                 not_empty(),
@@ -51,7 +52,7 @@ if (!isset($_SESSION["user"])) {
             "lot-step" => [
                 not_empty(),
                 it_is_number(),
-                checking_text_on_number_text_field(),
+                check_price_greater_than_zero(),
             ],
             "lot-date" => [
                 not_empty(),
@@ -60,14 +61,19 @@ if (!isset($_SESSION["user"])) {
             "lot-img" => [
                 checking_add_image(),
                 checking_type_image(),
-                add_image_to_lots_and_image_processing($id_image),
             ]
         ]
     );
 
-    //если ошибок нету
+    $errors_upload_file = add_file_to_lot($id_image, $lot_img, $errors);
+
+    if (!empty($errors_upload_file)) {
+        $errors["lot-img"] = $errors_upload_file;
+    }
+
     if (!count($errors)) {
-        $file_url = PATH_UPLOADS_IMAGE . $id_image . $_FILES["lot-img"]["name"];
+        resize_and_watermark_image_of_lot($id_image . $lot_img["name"]);
+        $file_url = PATH_UPLOADS_IMAGE . $id_image . $lot_img["name"];
         $query_insert_database_lot = "INSERT INTO `lots` (
             `created_at`,
             `name`,
@@ -83,15 +89,16 @@ if (!isset($_SESSION["user"])) {
         VALUES(
             NOW(), ?, ?, ?, ?, ?, ?, ?, '0', ?)";
         $stmt = db_get_prepare_stmt($con, $query_insert_database_lot, [
-            $_POST["lot-name"],
-            $_POST["message"],
+            $lot_name,
+            $message,
             $file_url,
-            $_POST["lot-rate"],
-            $_POST["lot-date"],
-            $_POST["lot-step"],
-            $_SESSION["user"]["id"],
-            $_POST["category"]
+            $lot_rate,
+            $lot_date,
+            $lot_step,
+            $author_id,
+            $category
         ]);
+
         $result = mysqli_stmt_execute($stmt);
 
         if ($result) {

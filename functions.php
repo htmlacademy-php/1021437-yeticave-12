@@ -1,4 +1,7 @@
 <?php
+
+use Imagine\Image\Box;
+
 /**
  * Форматирует число и добавляет в конце знак рубля
  * @param int $number Число для форматирования
@@ -99,7 +102,7 @@ function post_value(string $name, $default = null)
  *
  * @return string|null Текст
  */
-function file_image(string $name, $default = null)
+function get_file(string $name, $default = null)
 {
     return $_FILES[$name] ?? $default;
 }
@@ -289,6 +292,50 @@ function get_max_price_lot($max_price, $step, $price_start)
         $sum = $price_start + $step;
     }
     return $sum;
+}
+
+/**
+ * Обработка фотографии (изменения размера и
+ * добавление знака нашей площадки внизу изображения)
+ * @param string $file_name Имя файла
+ */
+function resize_and_watermark_image_of_lot($file_name) {
+    /**
+     * Обрезаем картинку лота
+     */
+    $imagine = new Imagine\Gd\Imagine();
+    $img = $imagine->open(PATH_UPLOADS_IMAGE . $file_name);
+    $img->resize(new Box(IMAGE_PARAMETERS["width"], IMAGE_PARAMETERS["height"]));
+    /**
+     * Добавляем watermark
+     */
+    $watermark = $imagine->open('img/logo.png');
+    $size = $img->getSize();
+    $wSize = $watermark->getSize();
+    $bottomRight = new Imagine\Image\Point($size->getWidth() - $wSize->getWidth(), $size->getHeight() - $wSize->getHeight());
+    $img->paste($watermark, $bottomRight);
+    /**
+     * Сохранение изображения
+     */
+    $img->save(PATH_UPLOADS_IMAGE . $file_name, IMAGE_QUALITY);
+}
+
+/**
+ * Если нету ошибок, функция перемещает файл
+ * в директорию PATH_UPLOADS_IMAGE или
+ * возращает ошибку
+ * @param int $id_image Уникальный номер
+ * @param array $file Файл
+ * @param array $errors Массив с ошибками
+ *
+ * @return string|null Текст ошибки
+ */
+function add_file_to_lot(int $id_image, $file, array $errors) {
+    if (empty($errors)) {
+        $file_name = $id_image . $file["name"];
+        move_uploaded_file($file["tmp_name"], PATH_UPLOADS_IMAGE . $file_name);
+        return $file["error"] !== UPLOAD_ERR_OK  ? "Ошибка при загрузке файла - код ошибки: " . $file["error"] : null;
+    }
 }
 
 /**
