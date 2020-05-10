@@ -59,9 +59,9 @@ if (!isset($_SESSION["user"])) {
                 checking_date_on_format_and_date_lot_end(),
             ],
             "lot-img" => [
+                is_file_uploaded(),
                 checking_add_image(),
                 checking_type_image(),
-                is_file_uploaded(),
             ]
         ]
     );
