@@ -15,12 +15,11 @@ for ($i = 1; $i <= mysqli_num_rows($lots_info); $i++) {
     $current_lot = $lot["id"];
     $lot_name = $lot["name"];
     //поиск последней ставки
-    $find_bets = mysqli_query($con, "SELECT `user_id` FROM `bids` WHERE lot_id = " . $current_lot . " ORDER BY created_at DESC LIMIT 1");
+    $find_bets = mysqli_query($con, "SELECT * FROM `users` WHERE id = (SELECT `user_id` FROM `bids` WHERE lot_id = " . $current_lot . " ORDER BY created_at DESC LIMIT 1)");
     if (mysqli_num_rows($find_bets) > 0) {
-        $user_winner = mysqli_fetch_assoc($find_bets);
+        $user_info = mysqli_fetch_assoc($find_bets);
         mysqli_query($con, "START TRANSACTION");
-        $user_winner = $user_winner["user_id"];
-        $user_info = mysqli_fetch_assoc(mysqli_query($con, "SELECT * FROM `users` WHERE id = " . $user_winner));
+        $user_winner = $user_info["id"];
         $update_winner = mysqli_query($con, "UPDATE `lots` SET `user_winner_id` = " . $user_winner . " WHERE id = " . $current_lot);
         $update_winner ? mysqli_query($con, "COMMIT") : mysqli_query($con, "ROLLBACK");
 
