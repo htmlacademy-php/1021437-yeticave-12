@@ -2,6 +2,13 @@
 require_once "init.php";
 require_once "vendor/autoload.php";
 require_once "helpers.php";
+//$lots_info = mysqli_query($con, "SELECT
+//    `id`,
+//    `author_id`,
+//    `name`
+//    FROM `lots` AS lots
+//    WHERE lots.ends_at <= NOW()
+//    AND lots.user_winner_id = 0");
 
 $lots_info = mysqli_query($con, "SELECT
         lots.id AS current_lot,
@@ -11,18 +18,19 @@ $lots_info = mysqli_query($con, "SELECT
         users.name AS fio_winner,
         users.id AS user_id
     FROM `lots` AS lots
-    JOIN `bids` AS bids
-    ON lots.id = bids.lot_id
 	JOIN `users` AS users
-    ON users.id = bids.user_id
+    ON users.id = (SELECT `user_id` FROM `bids` WHERE lot_id = lots.id ORDER BY created_at DESC LIMIT 1)
     WHERE lots.ends_at <= NOW()
-    AND lots.user_winner_id = 0
-    ORDER BY bids.created_at DESC");
+    AND lots.user_winner_id = 0");
 
 for ($i = 1; $i <= mysqli_num_rows($lots_info); $i++) {
     $lot = mysqli_fetch_assoc($lots_info);
     $current_lot = $lot["current_lot"];
     $lot_name = $lot["label_lot"];
+    //поиск последней ставки
+//    $find_bets = mysqli_query($con, "SELECT * FROM `users` WHERE id = (SELECT `user_id` FROM `bids` WHERE lot_id = " . $current_lot . " ORDER BY created_at DESC LIMIT 1)");
+//    if (mysqli_num_rows($find_bets) > 0) {
+//    $user_info = mysqli_fetch_assoc($find_bets);
     mysqli_query($con, "START TRANSACTION");
     $user_id_winner = $lot["user_id"];
     $update_winner = mysqli_query($con, "UPDATE `lots` SET `user_winner_id` = " . $user_id_winner . " WHERE id = " . $current_lot);
@@ -44,4 +52,5 @@ for ($i = 1; $i <= mysqli_num_rows($lots_info); $i++) {
     // Отправка сообщения
     $mailer = new Swift_Mailer($transport);
     $send_mail = $mailer->send($message);
+//    }
 }
