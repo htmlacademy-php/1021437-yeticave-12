@@ -1056,7 +1056,7 @@ input:invalid .form__error{
   -ms-flex-item-align: end;
   align-self: flex-end;
   padding: 6px 20px 7px;
-  height: 38px;
+  height: auto;
 }
 
 /* История ставок */
