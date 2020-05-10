@@ -65,13 +65,14 @@ if (!isset($_SESSION["user"])) {
         ]
     );
 
-    $errors_upload_file = add_file_to_lot($id_image, $lot_img, $errors);
+    $errors_upload_file = add_file_to_lot($lot_img);
 
-    if (!empty($errors_upload_file)) {
+    if (!empty($errors_upload_file) && empty($errors["lot-img"])) {
         $errors["lot-img"] = $errors_upload_file;
     }
 
     if (!count($errors)) {
+        move_file($id_image, $lot_img, PATH_UPLOADS_IMAGE);
         resize_and_watermark_image_of_lot($id_image . $lot_img["name"]);
         $file_url = PATH_UPLOADS_IMAGE . $id_image . $lot_img["name"];
         $query_insert_database_lot = "INSERT INTO `lots` (
