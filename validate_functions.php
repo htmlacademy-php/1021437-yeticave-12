@@ -173,6 +173,17 @@ function checking_add_image() : callable {
 }
 
 /**
+ * Функция возращает ошибку, если не получилось
+ * загрузить файл на сервер
+ * @return Closure
+ */
+function is_file_uploaded() {
+    return function ($value) : ? string {
+        return $value["error"] !== UPLOAD_ERR_OK  ? "Ошибка при загрузке файла - код ошибки: " . $value["error"] : null;
+    };
+}
+
+/**
  * Проверка корректности тпиа загруженного изображения
  *
  * @return callable

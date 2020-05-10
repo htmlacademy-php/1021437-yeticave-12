@@ -321,24 +321,13 @@ function resize_and_watermark_image_of_lot($file_name) {
 }
 
 /**
- * Функция возращает ошибку, если не получилось
- * загрузить файл на сервер
- * @param array $file Файл
- *
- * @return string|null Текст ошибки
- */
-function add_file_to_lot($file) {
-    return $file["error"] !== UPLOAD_ERR_OK  ? "Ошибка при загрузке файла - код ошибки: " . $file["error"] : null;
-}
-
-/**
  * Функция перемещает файл в папку,
  * указананя в атрибуте $folder
  * @param int $id_image Уникальный номер
  * @param array $file Файл
  * @param string $folder Имя папки
  */
-function move_file($id_image, $file, $folder) {
+function move_file_to_folder($id_image, $file, $folder) {
     $file_name = $id_image . $file["name"];
     move_uploaded_file($file["tmp_name"], $folder . $file_name);
 }
