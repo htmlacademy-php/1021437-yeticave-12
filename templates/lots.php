@@ -22,15 +22,14 @@ require_once "helpers.php";
                     </div>
                     <div class="lot__info">
                         <span class="lot__category"><?= htmlspecialchars($lot["category"]); ?></span>
-                        <h3 class="lot__title"><a class="text-link"
-                                                  href="lot.php?id=<?= $lot["id"] ?>"><?= htmlspecialchars($lot["name"]); ?></a>
+                        <h3 class="lot__title">
+                            <a class="text-link" href="lot.php?id=<?= $lot["id"] ?>"><?= htmlspecialchars($lot["name"]); ?></a>
                         </h3>
                         <div class="lot__state">
                             <div class="lot__rate">
                                 <?php if ((int)$lot["count_bets"] > 0) : ?>
                                     <span
-                                        class="lot__amount"><?= $lot["count_bets"] . " " . get_noun_plural_form($lot["count_bets"],
-                                            "ставка", "ставки", "ставок"); ?></span>
+                                        class="lot__amount"><?= $lot["count_bets"] . " " . get_noun_plural_form($lot["count_bets"], "ставка", "ставки", "ставок"); ?></span>
                                 <? else: ?>
                                     <span class="lot__amount">Стартовая цена</span>
                                 <? endif; ?>
@@ -49,5 +48,4 @@ require_once "helpers.php";
         <h2>Нет лотов в категории <span>«<?= $current_category ?>»</span></h2>
     <? endif; ?>
 </section>
-<?php echo render_pagination($count_lots, COUNT_ITEMS, $current_page, $page_count, $current_category,
-    'all-lots.php?category='); ?>
+<?php echo render_pagination($count_lots, COUNT_ITEMS, $current_page, $page_count, $current_category, 'all-lots.php?category='); ?>

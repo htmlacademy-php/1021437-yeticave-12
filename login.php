@@ -1,48 +1,32 @@
 <?php
 require_once "init.php";
 require_once "helpers.php";
+require_once "validate_functions.php";
 
-
-if (isset($_SESSION['user'])) {
+if (isset($_SESSION["user"])) {
     header("Location: index.php");
     exit();
 } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
     $errors = [];
-    $email = $_POST["email"];
-    $password = $_POST["password"];
-    function validate_email_field($email_field, $link)
-    {
-        if (empty($email_field)) {
-            return "Это поле обязательно к заполнению";
-        }
-        $result = get_data_user($link, $email_field);
-        if (mysqli_num_rows($result) === 0) {
-            return "Нет пользователя с таким адресом";
-        }
-    }
+    $email = post_value("email");
+    $password = post_value("password");
 
-    function validate_password_field($password_field, $email_field, $link)
-    {
-        if (empty($password_field)) {
-            return "Это поле обязательно к заполнению";
-        }
-        $result = get_data_user($link, $email_field);
-        $user_data = $result ? mysqli_fetch_assoc($result) : null;
-        if (!password_verify($password_field, $user_data["password"])) {
-            return "Указан неверный пароль";
-        }
-    }
-
-    $rules = [
-        "email" => function () use ($con, $email) {
-            return validate_email_field($email, $con);
-        },
-        "password" => function () use ($con, $email, $password) {
-            return validate_password_field($password, $email, $con);
-        }
-    ];
-
-    $errors = validation_form($_POST, $rules);
+    $errors = validate(
+        [
+            "email" => $email,
+            "password" => $password,
+        ],
+        [
+            "email" => [
+                not_empty(),
+                check_unique_value("users", "email", "Такого пользователя нету", $con),
+            ],
+            "password" => [
+                not_empty(),
+                password_correct($con, $email),
+            ],
+        ]
+    );
 
     if (empty($errors)) {
         $result = get_data_user($con, $email);

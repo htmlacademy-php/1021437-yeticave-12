@@ -1,6 +1,7 @@
 <?php
 require_once "init.php";
 require_once "helpers.php";
+require_once "validate_functions.php";
 
 if (isset($_SESSION["user"])) {
     http_response_code(403);
@@ -11,44 +12,38 @@ if (isset($_SESSION["user"])) {
     ]);
 } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
     $errors = [];
-    $email = $_POST["email"];
-    $password = $_POST["password"];
-    $name = $_POST["name"];
-    $message = $_POST["message"];
-    function validate_field_email($email_field, $link)
-    {
-        if (filter_var($email_field, FILTER_VALIDATE_EMAIL)) {
-            $email = mysqli_real_escape_string($link, $email_field);
-            $sql_query_empty_user = "SELECT `id` FROM users WHERE `email` = ?";
-            $stmt = db_get_prepare_stmt($link, $sql_query_empty_user, [$email]);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-            if (mysqli_num_rows($result) > 0) {
-                return "Пользователь с этим email уже зарегистрирован";
-            }
-        }
-        return check_field($email_field);
-    }
+    $email = post_value("email");
+    $password = post_value("password");
+    $name = post_value("name");
+    $message = post_value("message");
 
-    $rules = [
-        "email" => function () use ($con, $email) {
-            return validate_field_email($email, $con);
-        },
-        "password" => function () use ($password) {
-            return check_field($password);
-        },
-        "name" => function () use ($name) {
-            return check_field($name);
-        },
-        "message" => function () use ($message) {
-            return check_field($message);
-        }
-    ];
+    $errors = validate(
+        [
+            "email" => $email,
+            "password" => $password,
+            "name" => $name,
+            "message" => $message,
+        ],
+        [
+            "email" => [
+                not_empty(),
+                checking_correct_email(),
+                db_exists("users", "email", "Пользователь с этим email уже зарегистрирован", $con)
+            ],
+            "password" => [
+                not_empty(),
+            ],
+            "name" => [
+                not_empty(),
+            ],
+            "message" => [
+                not_empty(),
+            ],
+        ]
+    );
 
-    $errors = validation_form($_POST, $rules);
 
     if (empty($errors)) {
-        //шифруем пароль
         $password = password_hash($password, PASSWORD_DEFAULT);
         $query_insert_database_user = "INSERT INTO `users`(
             `registration_at`,

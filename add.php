@@ -1,8 +1,8 @@
 <?php
 require_once "init.php";
 require_once "helpers.php";
+require_once "validate_functions.php";
 require_once "vendor/autoload.php";
-use Imagine\Image\Box;
 
 if (!isset($_SESSION["user"])) {
     http_response_code(403);
@@ -13,109 +13,63 @@ if (!isset($_SESSION["user"])) {
     ]);
 } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
     $errors = [];
-    // функция проверки полей: lot-name, message
-    function validate_field_text($field_text, $max = null)
-    {
-        if ($max && mb_strlen($field_text) > $max) {
-            return "Значение должно быть не более $max символов";
-        }
-        return check_field($field_text);
-    }
+    $lot_name = post_value("lot-name");
+    $message = post_value("message");
+    $lot_rate = post_value("lot-rate");
+    $category = post_value("category");
+    $lot_step = post_value("lot-step");
+    $lot_date = post_value("lot-date");
+    $lot_img = get_file("lot-img", "");
+    $author_id = session_user_value("id");
+    $id_image = uniqid();
 
-    // функция проверки начальной цены и шага ставки
-    function validate_field_price($field_price)
-    {
-        if (!is_numeric($field_price)) {
-            return "Можно вводить только число";
-        }
-        $price = number_format($field_price, 2, ".", ",");
-        if ($price <= 0) {
-            return "Введите число больше нуля";
-        }
-        return check_field($field_price);
-    }
+    $errors = validate(
+        [
+            "lot-name" => $lot_name,
+            "message" => $message,
+            "lot-rate" => $lot_rate,
+            "category" => $category,
+            "lot-step" => $lot_step,
+            "lot-date" => $lot_date,
+            "lot-img" => $lot_img,
+        ],
+        [
+            "lot-name" => [
+                not_empty(),
+                str_length_gt(255),
+            ],
+            "message" => [
+                not_empty(),
+            ],
+            "lot-rate" => [
+                not_empty(),
+                it_is_number(),
+                check_price_greater_than_zero(),
+            ],
+            "category" => [
+                not_empty(),
+            ],
+            "lot-step" => [
+                not_empty(),
+                it_is_number(),
+                check_price_greater_than_zero(),
+            ],
+            "lot-date" => [
+                not_empty(),
+                checking_date_on_format_and_date_lot_end(),
+            ],
+            "lot-img" => [
+                is_file_uploaded(),
+                checking_add_image(),
+                checking_type_image(),
+            ]
+        ]
+    );
 
-    // функция проверки выбора категории
-    function validate_field_category($field_category)
-    {
-        return check_field($field_category);
-    }
-
-    // функция проверки даты
-    function validate_field_date($field_date)
-    {
-        $format_to_check = "Y-m-d";
-        $dateTimeObj = date_create_from_format($format_to_check, $field_date);
-        if ($dateTimeObj) {
-            $diff_in_hours = floor((strtotime($field_date) - strtotime("now")) / 3600);
-            if ($diff_in_hours <= 24) {
-                return "Дата заверешния торгов, не может быть меньше 24 часов или отрицательной";
-            }
-        }
-        return check_field($field_date);
-    }
-
-    //правила проверок
-    $rules = [
-        "lot-name" => function () {
-            return validate_field_text($_POST["lot-name"], 255);
-        },
-        "message" => function () {
-            return validate_field_text($_POST["message"]);
-        },
-        "lot-rate" => function () {
-            return validate_field_price($_POST["lot-rate"]);
-        },
-        "category" => function () {
-            return validate_field_category($_POST["category"]);
-        },
-        "lot-step" => function () {
-            return validate_field_price($_POST["lot-step"]);
-        },
-        "lot-date" => function () {
-            return validate_field_date($_POST["lot-date"]);
-        }
-    ];
-
-    $errors = validation_form($_POST, $rules);
-
-    if (empty($_FILES["lot-img"]["name"])) {
-        $errors["lot-img"] = "Файл обязателен для загрузки";
-    } else {
-        $id_image = uniqid();
-        $file_name = $id_image . $_FILES["lot-img"]["name"];
-        $type_file = mime_content_type($_FILES["lot-img"]["tmp_name"]);
-        if ($type_file !== "image/jpeg" && $type_file !== "image/png") {
-            $errors["lot-img"] = "Поддерживается загрузка только png, jpg, jpeg " . $type_file;
-        } else {
-            move_uploaded_file($_FILES["lot-img"]["tmp_name"], PATH_UPLOADS_IMAGE . $file_name);
-            if ($_FILES["lot-img"]["error"] !== UPLOAD_ERR_OK) {
-                return "Ошибка при загрузке файла - код ошибки: " . $_FILES["lot-img"]["error"];
-            }
-            /**
-             * Обрезаем картинку лота
-             */
-            $imagine = new Imagine\Gd\Imagine();
-            $img = $imagine->open(PATH_UPLOADS_IMAGE . $file_name);
-            $img->resize(new Box(IMAGE_PARAMETERS["width"], IMAGE_PARAMETERS["height"]));
-            /**
-             * Добавляем watermark
-             */
-            $watermark = $imagine->open('img/logo.png');
-            $size = $img->getSize();
-            $wSize = $watermark->getSize();
-            $bottomRight = new Imagine\Image\Point($size->getWidth() - $wSize->getWidth(), $size->getHeight() - $wSize->getHeight());
-            $img->paste($watermark, $bottomRight);
-            /**
-             * Сохранение изображения
-             */
-            $img->save(PATH_UPLOADS_IMAGE . $file_name, IMAGE_QUALITY);
-        }
-    }
-
-    //если ошибок нету
     if (!count($errors)) {
-        $file_url = PATH_UPLOADS_IMAGE . $id_image . $_FILES["lot-img"]["name"];
+        move_file_to_folder($id_image, $lot_img, PATH_UPLOADS_IMAGE);
+        resize_and_watermark_image_of_lot($id_image . $lot_img["name"]);
+        $file_url = PATH_UPLOADS_IMAGE . $id_image . $lot_img["name"];
         $query_insert_database_lot = "INSERT INTO `lots` (
             `created_at`,
             `name`,
@@ -131,15 +85,16 @@ if (!isset($_SESSION["user"])) {
         VALUES(
             NOW(), ?, ?, ?, ?, ?, ?, ?, '0', ?)";
         $stmt = db_get_prepare_stmt($con, $query_insert_database_lot, [
-            $_POST["lot-name"],
-            $_POST["message"],
+            $lot_name,
+            $message,
             $file_url,
-            $_POST["lot-rate"],
-            $_POST["lot-date"],
-            $_POST["lot-step"],
-            $_SESSION["user"]["id"],
-            $_POST["category"]
+            $lot_rate,
+            $lot_date,
+            $lot_step,
+            $author_id,
+            $category
         ]);
+
         $result = mysqli_stmt_execute($stmt);
 
         if ($result) {
