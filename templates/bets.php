@@ -13,12 +13,8 @@ require_once "functions.php";
         <table class="rates__list">
             <?php foreach ($bets as $bet) : ?>
                 <?php
-                if ((int)$bet["user_winner_id"] == $user_id) {
-                    $user_winner = true;
-                }
-                if (get_dt_end($bet["ends_at"])) {
-                    $lot_end = true;
-                }
+                    $user_winner = (int)$bet["user_winner_id"] === $user_id ? true : false;
+                    $lot_end = get_dt_end($bet["ends_at"]) ? true : false;
                 ?>
                 <tr class="rates__item <?php if ($user_winner) : ?> rates__item--win <? elseif ($lot_end) : ?>rates__item--end<? endif; ?>">
                     <td class="rates__info">

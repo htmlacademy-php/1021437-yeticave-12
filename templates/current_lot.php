@@ -2,7 +2,7 @@
 require_once "functions.php";
 require_once "helpers.php";
 $current_price = get_max_price_bids($bids, $lot["price_start"]);
-if (isset($bids)) {
+if (!empty($bids)) {
     $last_bet = (int)$bids[0]["id"];
 }
 ?>
