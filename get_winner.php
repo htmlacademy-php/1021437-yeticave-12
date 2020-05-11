@@ -23,22 +23,24 @@ for ($i = 1; $i <= mysqli_num_rows($lots_info); $i++) {
     mysqli_query($con, "START TRANSACTION");
     $user_id_winner = $lot["winner_id"];
     $update_winner = mysqli_query($con, "UPDATE `lots` SET `user_winner_id` = " . $user_id_winner . " WHERE id = " . $current_lot);
-    $update_winner ? mysqli_query($con, "COMMIT") : mysqli_query($con, "ROLLBACK");
-
-    $transport = new Swift_SmtpTransport(MAIL["host"], MAIL["port"], MAIL["encryption"]);
-    $transport->setUsername(MAIL["username"]);
-    $transport->setPassword(MAIL["password"]);
-    $message = new Swift_Message("Ваша ставка победила");
-    $message->setTo([$lot["winner_email"] => $lot["winner_name"]]);
-    $message->setFrom("admin@htmlacademy.ru", "YetiCave");
-    $msg_content = include_template("email.php", [
-        "user" => $lot["winner_name"],
-        "lot_id" => $current_lot,
-        "lot_name" => $lot_name,
-        "host_project" => $_SERVER["HTTP_HOST"],
-    ]);
-    $message->setBody($msg_content, 'text/html');
-    // Отправка сообщения
-    $mailer = new Swift_Mailer($transport);
-    $send_mail = $mailer->send($message);
+    if ($update_winner) {
+        mysqli_query($con, "COMMIT");
+        $transport = new Swift_SmtpTransport(MAIL["host"], MAIL["port"], MAIL["encryption"]);
+        $transport->setUsername(MAIL["username"]);
+        $transport->setPassword(MAIL["password"]);
+        $message = new Swift_Message("Ваша ставка победила");
+        $message->setTo([$lot["winner_email"] => $lot["winner_name"]]);
+        $message->setFrom("admin@htmlacademy.ru", "YetiCave");
+        $msg_content = include_template("email.php", [
+            "user" => $lot["winner_name"],
+            "lot_id" => $current_lot,
+            "lot_name" => $lot_name,
+            "host_project" => $_SERVER["HTTP_HOST"],
+        ]);
+        $message->setBody($msg_content, 'text/html');
+        $mailer = new Swift_Mailer($transport);
+        $send_mail = $mailer->send($message);
+    } else {
+        mysqli_query($con, "ROLLBACK");
+    }
 }
