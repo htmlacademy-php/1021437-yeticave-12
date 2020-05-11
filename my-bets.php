@@ -6,11 +6,11 @@ if (isset($_SESSION["user"])) {
     list($count_lots, $page_count) = compute_pagination_offset_and_limit(
         $con,
         "SELECT COUNT(id) AS 'count' FROM `bids` WHERE `user_id` = ?",
-        $_SESSION["user"]["id"]
+        session_user_value("id")
     );
     $current_page = get_page_value();
     $offset = get_offset_items($current_page, COUNT_ITEMS);
-    $current_id = get_escape_string($con, $_SESSION["user"]["id"]);
+    $current_id = get_escape_string($con, session_user_value("id"));
     $result_bids = mysqli_query(
         $con,
         "SELECT

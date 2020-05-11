@@ -17,7 +17,7 @@ $current_lot = "SELECT
     lot.author_id, 
     lot.author_id, 
     lot.ends_at,
-     category.name as category_name
+     category.name AS category_name
     FROM `lots` AS lot
     INNER JOIN `categories` AS category
     ON lot.category_id = category.id
@@ -38,7 +38,7 @@ $bids = mysqli_fetch_all($result_bids, MYSQLI_ASSOC);
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_SESSION["user"])) {
     // подготовка суммы ставки
-    $bird_sum = get_escape_string($con, $_POST["cost"]);
+    $bird_sum = get_escape_string($con, post_value("cost"));
     $lot = mysqli_fetch_assoc(mysqli_query($con, $current_lot));
     // узнаем есть ли ставки по этому лоту
     $max_value_bird = mysqli_query($con, "SELECT MAX(price) AS `max_price` FROM `bids` WHERE `lot_id` =" . $id_lot . " LIMIT 1");

@@ -11,8 +11,8 @@ $sql_lots = "SELECT
     lot.created_at, 
     lot.ends_at, 
     category.name AS category_name 
-    FROM `lots` as lot
-    INNER JOIN `categories` as category
+    FROM `lots` AS lot
+    INNER JOIN `categories` AS category
     ON lot.category_id = category.id
     WHERE lot.ends_at > NOW()
     ORDER BY `created_at` DESC LIMIT " . COUNT_ITEMS;
