@@ -16,6 +16,7 @@ if (isset($_GET["category"]) && $_GET["category"] !== "") {
     $current_page = get_page_value();
     $offset = get_offset_items($current_page, COUNT_ITEMS);
     $current_category = get_escape_string($con, $_GET["category"]);
+    $current_category_name = mysqli_fetch_assoc(mysqli_query($con, "SELECT `name` FROM `categories` WHERE `code` = '".$_GET["category"]."'"));
     $sql_query_lots_category = "SELECT
         lots.id, 
         lots.image_link, 
@@ -35,8 +36,9 @@ if (isset($_GET["category"]) && $_GET["category"] !== "") {
     $page_content = include_template("lots.php", [
         "categories" => $categories,
         "lots" => $lots,
-        "current_category" => $current_category ?? "",
+        "current_category_code" => $current_category ?? "",
         "count_lots" => $count_lots,
+        "current_category_name" => $current_category_name["name"],
         "page_count" => $page_count,
         "current_page" => $current_page,
     ]);
