@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+ini_set('error_reporting', E_ALL);
 define("DB_USER", "root");
 define("DB_PASSWORD", "147456");
 define("PATH_UPLOADS_IMAGE", "uploads/");
