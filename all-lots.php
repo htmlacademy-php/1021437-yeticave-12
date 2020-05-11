@@ -1,8 +1,8 @@
 <?php
 require_once "init.php";
 require_once "helpers.php";
-
-if (isset($_GET["category"]) && $_GET["category"] !== "") {
+$current_category = get_escape_string($con, get_value("category", ""));
+if (isset($current_category) && $current_category !== "") {
     list($count_lots, $page_count) = compute_pagination_offset_and_limit(
         $con,
         "SELECT 
@@ -11,12 +11,11 @@ if (isset($_GET["category"]) && $_GET["category"] !== "") {
         JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
         WHERE `ends_at` > NOW() 
         AND `categories`.`code` = ?",
-        $_GET["category"]
+        $current_category
     );
     $current_page = get_page_value();
     $offset = get_offset_items($current_page, COUNT_ITEMS);
-    $current_category = get_escape_string($con, $_GET["category"]);
-    $current_category_name = mysqli_fetch_assoc(mysqli_query($con, "SELECT `name` FROM `categories` WHERE `code` = '".$_GET["category"]."'"));
+    $current_category_name = mysqli_fetch_assoc(mysqli_query($con, "SELECT `name` FROM `categories` WHERE `code` = '".$current_category."'"));
     $sql_query_lots_category = "SELECT
         lots.id, 
         lots.image_link, 
@@ -38,7 +37,7 @@ if (isset($_GET["category"]) && $_GET["category"] !== "") {
         "lots" => $lots,
         "current_category_code" => $current_category ?? "",
         "count_lots" => $count_lots,
-        "current_category_name" => $current_category_name["name"],
+        "current_category_name" => $current_category_name["name"] ?? $current_category,
         "page_count" => $page_count,
         "current_page" => $current_page,
     ]);

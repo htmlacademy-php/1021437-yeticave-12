@@ -83,7 +83,7 @@ if (!isset($_SESSION["user"])) {
             `category_id`
         )
         VALUES(
-            NOW(), ?, ?, ?, ?, ?, ?, ?, '0', ?)";
+            NOW(), ?, ?, ?, ?, ?, ?, ?, 0, ?)";
         $stmt = db_get_prepare_stmt($con, $query_insert_database_lot, [
             $lot_name,
             $message,

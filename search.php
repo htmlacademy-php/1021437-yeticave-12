@@ -3,7 +3,7 @@ require_once "init.php";
 require_once "helpers.php";
 
 if ($_SERVER["REQUEST_METHOD"] === "GET") {
-    $str_search = trim($_GET["search"]);
+    $str_search = trim(get_value("search"));
 
     if (!empty($str_search)) {
         list($count_lots, $page_count) = compute_pagination_offset_and_limit(
