@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title><?= $title_page; ?></title>
+    <title><?= htmlspecialchars($title_page); ?></title>
     <link href="css/normalize.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
     <?= $css_calendar ?? ""; ?>
@@ -27,7 +27,7 @@
             <nav class="user-menu">
                 <?php if (isset($_SESSION["user"])) : ?>
                     <div class="user-menu__logged">
-                        <p><?= $user_name; ?></p>
+                        <p><?= htmlspecialchars($user_name); ?></p>
                         <a class="user-menu__bets" href="my-bets.php">Мои ставки</a>
                         <a class="user-menu__logout" href="logout.php">Выход</a>
                     </div>

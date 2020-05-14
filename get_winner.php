@@ -22,7 +22,10 @@ for ($i = 1; $i <= mysqli_num_rows($lots_info); $i++) {
     $lot_name = $lot["lot_name"];
     mysqli_query($con, "START TRANSACTION");
     $user_id_winner = $lot["winner_id"];
-    $update_winner = mysqli_query($con, "UPDATE `lots` SET `user_winner_id` = " . $user_id_winner . " WHERE id = " . $current_lot);
+    $update_winner = mysqli_query(
+        $con,
+        "UPDATE `lots` SET `user_winner_id` = " . $user_id_winner . " WHERE id = " . $current_lot
+    );
     if ($update_winner) {
         mysqli_query($con, "COMMIT");
         $transport = new Swift_SmtpTransport(MAIL["host"], MAIL["port"], MAIL["encryption"]);

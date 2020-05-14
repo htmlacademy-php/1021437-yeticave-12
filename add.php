@@ -36,7 +36,7 @@ if (!isset($_SESSION["user"])) {
         [
             "lot-name" => [
                 not_empty(),
-                str_length_gt(255),
+                str_length_gt(256),
             ],
             "message" => [
                 not_empty(),
@@ -45,6 +45,7 @@ if (!isset($_SESSION["user"])) {
                 not_empty(),
                 it_is_number(),
                 check_price_greater_than_zero(),
+                str_length_gt(19),
             ],
             "category" => [
                 not_empty(),
@@ -53,6 +54,7 @@ if (!isset($_SESSION["user"])) {
                 not_empty(),
                 it_is_number(),
                 check_price_greater_than_zero(),
+                str_length_gt(19),
             ],
             "lot-date" => [
                 not_empty(),
@@ -99,7 +101,6 @@ if (!isset($_SESSION["user"])) {
 
         if ($result) {
             $last_id = mysqli_insert_id($con);
-            // переадресация на страницу с новым добавленным лотом
             header("Location: lot.php?id=" . $last_id);
         } else {
             echo "Ошибка вставки " . mysqli_error($con);
@@ -114,6 +115,7 @@ if (!isset($_SESSION["user"])) {
 } else {
     $page_content = include_template("add-lot.php", [
         "categories" => $categories,
+        "id_category" => null,
     ]);
 }
 

@@ -100,7 +100,7 @@ function password_correct($link, $email) : callable
 function str_length_gt($max) : callable
 {
     return function ($value) use ($max): ? string {
-        return $max && mb_strlen($value) > $max ? "Значение должно быть не более $max символов" : "";
+        return $max && mb_strlen($value) > $max ? "Значение должно быть не более $max символов" : null;
     };
 }
 
@@ -112,7 +112,7 @@ function str_length_gt($max) : callable
 function it_is_number() : callable
 {
     return function ($value) : ? string {
-        return !is_numeric($value) ? "Можно вводить только число" : "";
+        return !is_numeric($value) ? "Можно вводить только число" : null;
     };
 }
 
@@ -125,7 +125,7 @@ function check_price_greater_than_zero() : callable
 {
     return function ($value) : ? string {
         $price = number_format($value, 2, ".", ",");
-        return $price <= 0 ?  "Введите число больше нуля" : "";
+        return $price <= 0 ?  "Введите число больше нуля" : null;
     };
 }
 
@@ -138,7 +138,7 @@ function check_price_greater_than_zero() : callable
 function checking_correct_email() : callable
 {
     return function ($value) : ? string {
-        return !filter_var($value, FILTER_VALIDATE_EMAIL) ? "Поле с адресом не является корректным" : "";
+        return !filter_var($value, FILTER_VALIDATE_EMAIL) ? "Поле с адресом не является корректным" : null;
     };
 }
 
@@ -155,7 +155,9 @@ function checking_date_on_format_and_date_lot_end() : callable
         $dateTimeObj = date_create_from_format($format_to_check, $value);
         if ($dateTimeObj) {
             $diff_in_hours = floor((strtotime($value) - strtotime("now")) / 3600);
-            return $diff_in_hours <= 24 ? "Дата заверешния торгов, не может быть меньше 24 часов или отрицательной" : "";
+            return $diff_in_hours <= 24 ?
+                "Дата заверешния торгов, не может быть меньше 24 часов или отрицательной" :
+                null;
         }
         return "Не верный формат времени";
     };
@@ -166,7 +168,8 @@ function checking_date_on_format_and_date_lot_end() : callable
  *
  * @return callable
  */
-function checking_add_image() : callable {
+function checking_add_image() : callable
+{
     return function ($image): ? string {
         return empty($image["name"]) ? "Файл обязателен для загрузки" : null;
     };
@@ -177,9 +180,19 @@ function checking_add_image() : callable {
  * загрузить файл на сервер
  * @return Closure
  */
-function is_file_uploaded() {
+function is_file_uploaded()
+{
     return function ($value) : ? string {
-        return $value["error"] !== UPLOAD_ERR_OK  ? "Ошибка при загрузке файла - код ошибки: " . $value["error"] : null;
+        $error_info = [
+            "1" => "размер файла слишком большой",
+            "2" => "размер файла слишком большой",
+            "3" => "файл был получен только частично",
+            "4" => "файл не был загружен",
+            "6" => "отсутствует временная папка",
+            "7" => "не удалось записать файл",
+            "8" => "загрузка файла была остановлена",
+        ];
+        return $value["error"] !== UPLOAD_ERR_OK  ? "Ошибка при загрузке файла: " . $error_info[$value["error"]] : null;
     };
 }
 
@@ -188,10 +201,13 @@ function is_file_uploaded() {
  *
  * @return callable
  */
-function checking_type_image() : callable {
+function checking_type_image() : callable
+{
     return function ($image) : ? string {
         $type_file = mime_content_type($image["tmp_name"]);
-        return ($type_file !== "image/jpeg" && $type_file !== "image/png") ? "Поддерживается загрузка только png, jpg, jpeg" : null;
+        return ($type_file !== "image/jpeg" && $type_file !== "image/png") ?
+            "Поддерживается загрузка только png, jpg, jpeg" :
+            null;
     };
 }
 

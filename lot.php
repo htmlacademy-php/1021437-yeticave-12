@@ -1,6 +1,7 @@
 <?php
 require_once "init.php";
 require_once "helpers.php";
+require_once "validate_functions.php";
 
 // получение идентификатора с помощью фильтра целое число
 $id_lot = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT);
@@ -38,23 +39,49 @@ $bids = mysqli_fetch_all($result_bids, MYSQLI_ASSOC);
 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_SESSION["user"])) {
     // подготовка суммы ставки
-    $bird_sum = get_escape_string($con, post_value("cost"));
+    $bet_sum = get_escape_string($con, post_value("cost"));
     $lot = mysqli_fetch_assoc(mysqli_query($con, $current_lot));
     // узнаем есть ли ставки по этому лоту
-    $max_value_bird = mysqli_query($con, "SELECT MAX(price) AS `max_price` FROM `bids` WHERE `lot_id` =" . $id_lot . " LIMIT 1");
+    $max_value_bird = mysqli_query(
+        $con,
+        "SELECT MAX(price) AS `max_price` FROM `bids` WHERE `lot_id` =" . $id_lot . " LIMIT 1"
+    );
     $max_value = mysqli_fetch_assoc($max_value_bird);
     $new_sum = get_max_price_lot($max_value["max_price"], $lot["step_rate"], $lot["price_start"]);
 
-    if ($new_sum <= $bird_sum) {
-        $page_content = create_bet($bird_sum, $con, $id_lot) ? header("Location: lot.php?id=" . $id_lot) : $page_content = include_template("error.php", [
-            "text_error" => "Ошибка вставки: " . mysqli_errno($con)
+    $errors = validate(
+        [
+            "cost" => post_value("cost"),
+        ],
+        [
+            "cost" => [
+                not_empty(),
+                str_length_gt(12),
+            ],
+        ]
+    );
+
+    if ($new_sum <= $bet_sum && empty($errors)) {
+        $page_content = create_bet($bet_sum, $con, $id_lot) ?
+            header("Location: lot.php?id=" . $id_lot) :
+            $page_content = include_template("error.php", [
+            "code_error" => "404",
+            "text_error" => "Ошибка вставки: " . mysqli_errno($con),
+        ]);
+    } elseif ($errors) {
+        $page_content = include_template("current_lot.php", [
+            "categories" => $categories,
+            "lot" => $lot,
+            "bids" => $bids,
+            "bet_sum" => $bet_sum,
+            "text_error" => $errors["cost"],
         ]);
     } else {
         $page_content = include_template("current_lot.php", [
             "categories" => $categories,
             "lot" => $lot,
             "bids" => $bids,
-            "bird_sum" => $bird_sum,
+            "bet_sum" => $bet_sum,
             "text_error" => "Сумма ставки меньше минимальной или введено некорректное значение",
         ]);
     }

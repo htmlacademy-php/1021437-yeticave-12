@@ -17,11 +17,14 @@ $sql_lots = "SELECT
     WHERE lot.ends_at > NOW()
     ORDER BY `created_at` DESC LIMIT " . COUNT_ITEMS;
 $result_lots = mysqli_query($con, $sql_lots);
-$lots = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
+if ($result_lots) {
+    $lots = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
+}
+
 
 $page_content = include_template("main.php", [
     "categories" => $categories,
-    "lots" => $lots
+    "lots" => $lots ?? "",
 ]);
 
 $layout_content = include_template("layout.php", [
