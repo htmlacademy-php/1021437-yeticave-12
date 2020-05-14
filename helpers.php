@@ -48,11 +48,9 @@ function db_get_prepare_stmt($link, $sql, $data = [])
 
             if (is_int($value)) {
                 $type = 'i';
-            }
-            elseif (is_string($value)) {
+            } elseif (is_string($value)) {
                 $type = 's';
-            }
-            elseif (is_double($value)) {
+            } elseif (is_double($value)) {
                 $type = 'd';
             }
 
@@ -145,5 +143,3 @@ function include_template($name, array $data = [])
 
     return $result;
 }
-
-

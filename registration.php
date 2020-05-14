@@ -28,20 +28,21 @@ if (isset($_SESSION["user"])) {
             "email" => [
                 not_empty(),
                 checking_correct_email(),
-                db_exists("users", "email", "Пользователь с этим email уже зарегистрирован", $con)
+                db_exists("users", "email", "Пользователь с этим email уже зарегистрирован", $con),
+                str_length_gt(254),
             ],
             "password" => [
                 not_empty(),
             ],
             "name" => [
                 not_empty(),
+                str_length_gt(128),
             ],
             "message" => [
                 not_empty(),
             ],
         ]
     );
-
 
     if (empty($errors)) {
         $password = password_hash($password, PASSWORD_DEFAULT);

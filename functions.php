@@ -186,7 +186,15 @@ function render_pagination_button(
         $disable = "style='pointer-events: none;'";
     }
     $string_template = '<li %s class="pagination-item %s"><a href="%s%s&page=%d">%s</a></li>';
-    return sprintf($string_template, $disable, $class_important, $path_button, $text_search, $current_page, $text_button);
+    return sprintf(
+        $string_template,
+        $disable,
+        $class_important,
+        $path_button,
+        $text_search,
+        $current_page,
+        $text_button
+    );
 }
 
 /**
@@ -209,7 +217,14 @@ function render_pagination($all_lots, $value_items, $current_page, $pages, $str_
         if ($current_page === 1) {
             $pagination .= render_pagination_button("#", "Назад", "pagination-item-prev", true);
         } else {
-            $pagination .= render_pagination_button($path_search, "Назад", "pagination-item-prev", false, $str_search, $current_page - 1);
+            $pagination .= render_pagination_button(
+                $path_search,
+                "Назад",
+                "pagination-item-prev",
+                false,
+                $str_search,
+                - 1
+            );
         }
 
         for ($i = 1; $i <= $pages; $i++) {
@@ -221,7 +236,14 @@ function render_pagination($all_lots, $value_items, $current_page, $pages, $str_
         }
 
         if ($pages > $current_page) {
-            $pagination .= render_pagination_button($path_search, "Вперед", "pagination-item-next", false, $str_search, $current_page + 1);
+            $pagination .= render_pagination_button(
+                $path_search,
+                "Вперед",
+                "pagination-item-next",
+                false,
+                $str_search,
+                $current_page + 1
+            );
         } else {
             $pagination .= render_pagination_button("#", "Вперед", "pagination-item-next", true);
         }
@@ -299,7 +321,8 @@ function get_max_price_lot($max_price, $step, $price_start)
  * добавление знака нашей площадки внизу изображения)
  * @param string $file_name Имя файла
  */
-function resize_and_watermark_image_of_lot($file_name) {
+function resize_and_watermark_image_of_lot($file_name)
+{
     /**
      * Обрезаем картинку лота
      */
@@ -312,7 +335,10 @@ function resize_and_watermark_image_of_lot($file_name) {
     $watermark = $imagine->open('img/logo.png');
     $size = $img->getSize();
     $wSize = $watermark->getSize();
-    $bottomRight = new Imagine\Image\Point($size->getWidth() - $wSize->getWidth(), $size->getHeight() - $wSize->getHeight());
+    $bottomRight = new Imagine\Image\Point(
+        $size->getWidth() - $wSize->getWidth(),
+        $size->getHeight() - $wSize->getHeight()
+    );
     $img->paste($watermark, $bottomRight);
     /**
      * Сохранение изображения
@@ -327,7 +353,8 @@ function resize_and_watermark_image_of_lot($file_name) {
  * @param array $file Файл
  * @param string $folder Имя папки
  */
-function move_file_to_folder($id_image, $file, $folder) {
+function move_file_to_folder($id_image, $file, $folder)
+{
     $file_name = $id_image . $file["name"];
     move_uploaded_file($file["tmp_name"], $folder . $file_name);
 }

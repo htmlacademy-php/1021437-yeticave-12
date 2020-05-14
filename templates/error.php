@@ -1,7 +1,7 @@
 <section class="lot-item container">
-    <h2>Код ошибки: <?= $code_error; ?></h2>
+    <h2>Код ошибки: <?= htmlspecialchars($code_error); ?></h2>
     <p><?= $text_error; ?></p>
-    <? if (isset($view_categories)): ?>
+    <?php if (isset($view_categories)): ?>
         <nav class="nav">
             <ul class="nav__list container">
                 <?php foreach ($categories as $category) : ?>
