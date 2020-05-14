@@ -24,7 +24,7 @@ if ($result_lots) {
 
 $page_content = include_template("main.php", [
     "categories" => $categories,
-    "lots" => $lots ?? "",
+    "lots" => $lots ?? array(),
 ]);
 
 $layout_content = include_template("layout.php", [

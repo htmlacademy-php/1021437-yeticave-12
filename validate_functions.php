@@ -4,12 +4,13 @@
  * Проверяет на установке значения или
  * возращает ошибку
  *
+ * @param string $label Текст
  * @return callable
  */
-function not_empty(): callable
+function not_empty(string $label): callable
 {
-    return function ($value): ? string {
-        return empty($value) ? "Это поле обязательно к заполнению" : null;
+    return function ($value) use ($label): ? string {
+        return empty($value) ? $label : null;
     };
 }
 

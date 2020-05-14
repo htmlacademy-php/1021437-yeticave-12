@@ -35,29 +35,29 @@ if (!isset($_SESSION["user"])) {
         ],
         [
             "lot-name" => [
-                not_empty(),
+                not_empty("Введите название лота"),
                 str_length_gt(256),
             ],
             "message" => [
-                not_empty(),
+                not_empty("Введите описание лота"),
             ],
             "lot-rate" => [
-                not_empty(),
+                not_empty("Цена должна быть больше 0"),
                 it_is_number(),
                 check_price_greater_than_zero(),
                 str_length_gt(19),
             ],
             "category" => [
-                not_empty(),
+                not_empty("Укажите категорию лота"),
             ],
             "lot-step" => [
-                not_empty(),
+                not_empty("Цена должна быть больше 0"),
                 it_is_number(),
                 check_price_greater_than_zero(),
                 str_length_gt(19),
             ],
             "lot-date" => [
-                not_empty(),
+                not_empty("Введите дату окончания дейтсвия лота"),
                 checking_date_on_format_and_date_lot_end(),
             ],
             "lot-img" => [
