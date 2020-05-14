@@ -18,11 +18,11 @@ if (isset($_SESSION["user"])) {
         ],
         [
             "email" => [
-                not_empty(),
+                not_empty("Введите электронный адрес"),
                 check_unique_value("users", "email", "Такого пользователя нету", $con),
             ],
             "password" => [
-                not_empty(),
+                not_empty("Введите пароль"),
                 password_correct($con, $email),
             ],
         ]

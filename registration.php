@@ -26,20 +26,20 @@ if (isset($_SESSION["user"])) {
         ],
         [
             "email" => [
-                not_empty(),
+                not_empty("Введите электронный адресс"),
                 checking_correct_email(),
                 db_exists("users", "email", "Пользователь с этим email уже зарегистрирован", $con),
                 str_length_gt(254),
             ],
             "password" => [
-                not_empty(),
+                not_empty("Введите пароль"),
             ],
             "name" => [
-                not_empty(),
+                not_empty("Укажите Ваше ФИО"),
                 str_length_gt(128),
             ],
             "message" => [
-                not_empty(),
+                not_empty("Напишите как с вами связаться"),
             ],
         ]
     );

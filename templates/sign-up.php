@@ -21,7 +21,7 @@ require_once "functions.php";
     <div class="form__item <?php if (!empty($errors["message"])) : ?> form__item--invalid <? endif; ?>">
         <label for="message">Контактные данные <sup>*</sup></label>
         <textarea id="message" name="message" placeholder="Напишите как с вами связаться"><?= htmlspecialchars(post_value("message")) ?></textarea>
-        <span class="form__error">Напишите как с вами связаться</span>
+        <span class="form__error"><?= $errors["message"] ?? "" ?></span>
     </div>
     <span class="form__error <?php if (!empty($errors)) : ?>form__error--bottom<? endif; ?>">Пожалуйста, исправьте ошибки в форме.</span>
     <button type="submit" class="button">Зарегистрироваться</button>

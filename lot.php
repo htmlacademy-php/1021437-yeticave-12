@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_SESSION["user"])) {
         ],
         [
             "cost" => [
-                not_empty(),
+                not_empty("Укажите сумму больше или равной минимальной"),
                 str_length_gt(12),
             ],
         ]
