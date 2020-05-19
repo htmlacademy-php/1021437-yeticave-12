@@ -59,9 +59,8 @@ if (isset($_SESSION["user"])) {
         if ($result) {
             header("location: login.php");
             exit();
-        } else {
-            echo "Ошибка вставки " . mysqli_error($con);
         }
+        echo "Ошибка вставки " . mysqli_error($con);
     } else {
         $page_content = include_template("sign-up.php", [
             "errors" => $errors,
@@ -74,7 +73,7 @@ if (isset($_SESSION["user"])) {
 $layout_content = include_template("layout.php", [
     "main_content" => $page_content,
     "title_page" => "Страница регистрации",
-    "user_name" => session_user_value("name", ""),
+    "user_name" => get_value_from_user_session("name"),
     "categories" => $categories,
 ]);
 

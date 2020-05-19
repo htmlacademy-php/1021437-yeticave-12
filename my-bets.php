@@ -2,18 +2,21 @@
 require_once "init.php";
 require_once "helpers.php";
 
-if (isset($_SESSION["user"])) {
-    list($count_lots, $page_count) = compute_pagination_offset_and_limit(
-        $con,
-        "SELECT COUNT(id) AS 'count' FROM `bids` WHERE `user_id` = ?",
-        session_user_value("id")
-    );
-    $current_page = get_page_value();
-    $offset = get_offset_items($current_page, COUNT_ITEMS);
-    $current_id = get_escape_string($con, session_user_value("id"));
-    $result_bids = mysqli_query(
-        $con,
-        "SELECT
+if (!isset($_SESSION["user"])) {
+    header("Location: /");
+}
+
+list($count_lots, $page_count) = compute_pagination_offset_and_limit(
+    $con,
+    "SELECT COUNT(id) AS 'count' FROM `bids` WHERE `user_id` = ?",
+    get_value_from_user_session("id")
+);
+$current_page = get_page_value();
+$offset = get_offset_items($current_page, COUNT_ITEMS);
+$current_id = get_escape_string($con, get_value_from_user_session("id"));
+$result_bids = mysqli_query(
+    $con,
+    "SELECT
             lots.name, 
             lots.image_link, 
             categories.name AS category, 
@@ -31,24 +34,22 @@ if (isset($_SESSION["user"])) {
         WHERE `user_id` = " . $current_id . " 
         ORDER BY bids.created_at DESC 
         LIMIT " . COUNT_ITEMS . " OFFSET " . $offset
-    );
-    $bets = mysqli_fetch_all($result_bids, MYSQLI_ASSOC);
+);
+get_error($con);
+$bets = mysqli_fetch_all($result_bids, MYSQLI_ASSOC);
 
-    $page_content = include_template("bets.php", [
-        "bets" => $bets,
-        "user_id" => session_user_value("id"),
-        "count_lots" => $count_lots,
-        "page_count" => $page_count,
-        "current_page" => $current_page,
-    ]);
-} else {
-    header("Location: /");
-}
+$page_content = include_template("bets.php", [
+    "bets" => $bets,
+    "user_id" => get_value_from_user_session("id"),
+    "count_lots" => $count_lots,
+    "page_count" => $page_count,
+    "current_page" => $current_page,
+]);
 
 $layout_content = include_template("layout.php", [
     "main_content" => $page_content,
     "title_page" => "Страница лота",
-    "user_name" => session_user_value("name", ""),
+    "user_name" => get_value_from_user_session("name"),
     "categories" => $categories,
 ]);
 

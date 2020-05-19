@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
 $layout_content = include_template("layout.php", [
     "main_content" => $page_content,
     "title_page" => "Страница регистрации",
-    "user_name" => session_user_value("name", ""),
+    "user_name" => get_value_from_user_session("name"),
     "categories" => $categories,
 ]);
 
