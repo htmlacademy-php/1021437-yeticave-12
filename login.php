@@ -6,7 +6,9 @@ require_once "validate_functions.php";
 if (isset($_SESSION["user"])) {
     header("Location: index.php");
     exit();
-} elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
+}
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $errors = [];
     $email = post_value("email");
     $password = post_value("password");
@@ -33,18 +35,17 @@ if (isset($_SESSION["user"])) {
         $_SESSION["user"] = $result ? mysqli_fetch_assoc($result) : null;
         header("Location: index.php");
         exit();
-    } else {
-        $page_content = include_template("login.php", [
-            "errors" => $errors,
-            "text_errors" => "Вы ввели неверный email/пароль",
-            "email" => post_value("email", ""),
-            "password" => post_value("password", ""),
-        ]);
     }
+    $page_content = include_template("login.php", [
+        "errors" => $errors,
+        "text_errors" => "Вы ввели неверный email/пароль",
+        "email" => post_value("email"),
+        "password" => post_value("password"),
+    ]);
 } else {
     $page_content = include_template("login.php", [
-        "email" => post_value("email", ""),
-        "password" => post_value("password", ""),
+        "email" => post_value("email"),
+        "password" => post_value("password"),
     ]);
 }
 

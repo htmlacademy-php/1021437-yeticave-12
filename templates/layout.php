@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title><?= htmlspecialchars($title_page); ?></title>
+    <title><?= $title_page; ?></title>
     <link href="css/normalize.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
     <?= $css_calendar ?? ""; ?>
@@ -20,14 +20,14 @@
                 <input type="search" name="search" placeholder="Поиск лота" value="<?= get_value("search", "");?>">
                 <input class="main-header__search-btn" type="submit" value="Найти">
             </form>
-            <?php if (isset($_SESSION["user"])) : ?>
+            <?php if (isset($user_name)) : ?>
                 <a class="main-header__add-lot button" href="add.php">Добавить лот</a>
             <?php endif; ?>
 
             <nav class="user-menu">
-                <?php if (isset($_SESSION["user"])) : ?>
+                <?php if (isset($user_name)) : ?>
                     <div class="user-menu__logged">
-                        <p><?= htmlspecialchars($user_name); ?></p>
+                        <p><?= htmlspecialchars($user_name, ENT_QUOTES); ?></p>
                         <a class="user-menu__bets" href="my-bets.php">Мои ставки</a>
                         <a class="user-menu__logout" href="logout.php">Выход</a>
                     </div>
@@ -55,7 +55,7 @@
         <ul class="nav__list container">
             <?php foreach ($categories as $category) : ?>
                 <li class="nav__item">
-                    <a href="all-lots.php?category=<?= htmlspecialchars($category["code"]) ?>"><?= htmlspecialchars($category["name"]) ?></a>
+                    <a href="all-lots.php?category=<?= htmlspecialchars($category["code"], ENT_QUOTES) ?>"><?= htmlspecialchars($category["name"], ENT_QUOTES) ?></a>
                 </li>
             <?php endforeach; ?>
         </ul>
@@ -105,7 +105,7 @@
         </div>
         <?php if (isset($_SESSION["user"])) : ?>
             <a class="main-footer__add-lot button" href="add.php">Добавить лот</a>
-        <? endif; ?>
+        <?php endif; ?>
         <div class="main-footer__developed-by">
             <span class="visually-hidden">Разработано:</span>
             <a class="logo-academy" href="https://htmlacademy.ru/intensive/php">

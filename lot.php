@@ -4,7 +4,7 @@ require_once "helpers.php";
 require_once "validate_functions.php";
 
 // получение идентификатора с помощью фильтра целое число
-$id_lot = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT);
+$lot_id = filter_input(INPUT_GET, "id", FILTER_SANITIZE_NUMBER_INT);
 // выборка информации о лоте
 $current_lot = "SELECT 
     lot.id, 
@@ -22,7 +22,7 @@ $current_lot = "SELECT
     FROM `lots` AS lot
     INNER JOIN `categories` AS category
     ON lot.category_id = category.id
-    WHERE lot.id = '$id_lot'";
+    WHERE lot.id = '$lot_id'";
 // выборка истории ставок
 $sql_bids = "SELECT 
     users.name, 
@@ -32,7 +32,7 @@ $sql_bids = "SELECT
     FROM `bids` AS bids
     INNER JOIN `users` AS users
     ON bids.user_id = users.id
-    WHERE `lot_id` = '$id_lot'
+    WHERE `lot_id` = '$lot_id'
     ORDER BY bids.created_at DESC";
 $result_bids = mysqli_query($con, $sql_bids);
 $bids = mysqli_fetch_all($result_bids, MYSQLI_ASSOC);
@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_SESSION["user"])) {
     // узнаем есть ли ставки по этому лоту
     $max_value_bird = mysqli_query(
         $con,
-        "SELECT MAX(price) AS `max_price` FROM `bids` WHERE `lot_id` =" . $id_lot . " LIMIT 1"
+        "SELECT MAX(price) AS `max_price` FROM `bids` WHERE `lot_id` =" . $lot_id . " LIMIT 1"
     );
     $max_value = mysqli_fetch_assoc($max_value_bird);
     $new_sum = get_max_price_lot($max_value["max_price"], $lot["step_rate"], $lot["price_start"]);
@@ -62,8 +62,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_SESSION["user"])) {
     );
 
     if ($new_sum <= $bet_sum && empty($errors)) {
-        $page_content = create_bet($bet_sum, $con, $id_lot) ?
-            header("Location: lot.php?id=" . $id_lot) :
+        $page_content = create_bet($bet_sum, $con, $lot_id) ?
+            header("Location: lot.php?id=" . $lot_id) :
             $page_content = include_template("error.php", [
             "code_error" => "404",
             "text_error" => "Ошибка вставки: " . mysqli_errno($con),
@@ -75,6 +75,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_SESSION["user"])) {
             "bids" => $bids,
             "bet_sum" => $bet_sum,
             "text_error" => $errors["cost"],
+            "current_price" => get_max_price_bids($bids, $lot["price_start"]),
+            "user_id" => get_value_from_user_session("id"),
         ]);
     } else {
         $page_content = include_template("current_lot.php", [
@@ -83,21 +85,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_SESSION["user"])) {
             "bids" => $bids,
             "bet_sum" => $bet_sum,
             "text_error" => "Сумма ставки меньше минимальной или введено некорректное значение",
+            "current_price" => get_max_price_bids($bids, $lot["price_start"]),
+            "user_id" => get_value_from_user_session("id"),
         ]);
     }
 } else {
     $result_lot = mysqli_query($con, $current_lot);
+    get_error($con);
     if (mysqli_num_rows($result_lot)) {
         $lot = mysqli_fetch_assoc($result_lot);
         $page_content = include_template("current_lot.php", [
             "categories" => $categories,
             "lot" => $lot,
             "bids" => $bids,
+            "current_price" => get_max_price_bids($bids, $lot["price_start"]),
+            "user_id" => get_value_from_user_session("id"),
         ]);
     } else {
         $page_content = include_template("error.php", [
             "code_error" => "404",
-            "text_error" => "Не удалось найти страницу с лотом №-" . "<b>" . $id_lot . "</b>",
+            "text_error" => "Не удалось найти страницу с лотом №- <b> $lot_id </b>",
         ]);
     }
 }
@@ -106,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_SESSION["user"])) {
 $layout_content = include_template("layout.php", [
     "main_content" => $page_content,
     "title_page" => "Страница лота",
-    "user_name" => session_user_value("name", ""),
+    "user_name" => get_value_from_user_session("name"),
     "categories" => $categories,
 ]);
 

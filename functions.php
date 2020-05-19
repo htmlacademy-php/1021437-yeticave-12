@@ -8,11 +8,10 @@ use Imagine\Image\Box;
  *
  * @return string Отформатированное число со знаком рубля
  */
-function format_sum($number = 0)
+function format_sum(int $number = 0)
 {
     $price = ceil($number);
-    $format_price = number_format($price, 0, ",", " ");
-    return $format_price . " ₽";
+    return number_format($price, 0, ",", " ") . " ₽";
 }
 
 /**
@@ -25,9 +24,7 @@ function format_sum($number = 0)
 function get_dt_range($value_date)
 {
     $time_difference = strtotime($value_date) - time();
-    $time_hours = floor($time_difference / 3600);
-    $time_minutes = floor(($time_difference % 3600) / 60);
-    return [$time_hours, $time_minutes];
+    return [floor($time_difference / 3600), floor(($time_difference % 3600) / 60)];
 }
 
 /**
@@ -40,9 +37,7 @@ function get_dt_range($value_date)
 function get_dt_difference($value_time_my)
 {
     $time_difference = time() - strtotime($value_time_my);
-    $time_hours = floor($time_difference / 3600);
-    $time_minutes = floor(($time_difference % 3600) / 60);
-    return [(int)$time_hours, $time_minutes];
+    return [(int)floor($time_difference / 3600), floor(($time_difference % 3600) / 60)];
 }
 
 /**
@@ -67,7 +62,7 @@ function get_dt_end($value_date)
  *
  * @return mixed
  */
-function get_max_price_bids($prices, $price_start)
+function get_max_price_bids(array $prices, int $price_start)
 {
     if (!isset($prices[0]["price"])) {
         return $price_start;
@@ -91,7 +86,7 @@ function get_max_price_bids($prices, $price_start)
  */
 function post_value(string $name, $default = null)
 {
-    return $_POST[$name] ?? $default;
+    return isset($_POST[$name]) ? trim($_POST[$name]) : $default;
 }
 
 /**
@@ -115,7 +110,8 @@ function get_file(string $name, $default = null)
  *
  * @return string|null Текст
  */
-function session_user_value(string $name, $default = null)
+
+function get_value_from_user_session(string $name, $default = null)
 {
     return $_SESSION["user"][$name] ?? $default;
 }
@@ -130,7 +126,7 @@ function session_user_value(string $name, $default = null)
  */
 function get_value(string $name, $default = null)
 {
-    return $_GET[$name] ?? $default;
+    return isset($_GET[$name]) ? trim($_GET[$name]) : $default;
 }
 
 /**
@@ -223,7 +219,7 @@ function render_pagination($all_lots, $value_items, $current_page, $pages, $str_
                 "pagination-item-prev",
                 false,
                 $str_search,
-                - 1
+                $current_page - 1
             );
         }
 
@@ -261,8 +257,7 @@ function render_pagination($all_lots, $value_items, $current_page, $pages, $str_
  */
 function get_escape_string($connect, $text)
 {
-    $str = mysqli_real_escape_string($connect, $text);
-    return $str;
+    return mysqli_real_escape_string($connect, $text);
 }
 
 /**
@@ -273,10 +268,9 @@ function get_escape_string($connect, $text)
  *
  * @return int Число
  */
-function get_offset_items($page, $count_items)
+function get_offset_items(int $page, int $count_items)
 {
-    $offset = ($page - 1) * $count_items;
-    return abs($offset);
+    return ($page - 1) * $count_items;
 }
 
 /**
@@ -288,7 +282,7 @@ function get_offset_items($page, $count_items)
  *
  * @return array Текущая страница, количество лотов, количество страниц, отступ
  */
-function compute_pagination_offset_and_limit($link, $sql_query, $data)
+function compute_pagination_offset_and_limit($link, string $sql_query, $data)
 {
     $stmt_count = db_get_prepare_stmt($link, $sql_query, [$data]);
     mysqli_stmt_execute($stmt_count);
@@ -368,9 +362,21 @@ function move_file_to_folder($id_image, $file, $folder)
  *
  * @return string $page_content Шаблон ошибки вставки
  */
-function create_bet($bet_sum, $link, $id_lot)
+function create_bet(int $bet_sum, $link, int $id_lot)
 {
     $sql_insert_bids = "INSERT INTO `bids` (`created_at`, `price`, `user_id`, `lot_id`) VALUES (NOW(), ?, ?, ?)";
     $stmt = db_get_prepare_stmt($link, $sql_insert_bids, [$bet_sum, $_SESSION["user"]["id"], $id_lot]);
     return mysqli_stmt_execute($stmt);
+}
+
+/** Если обнаружены ошибки то
+ * останавливает работу приложения
+ * @param mysqli $link Ресурс соединения
+ */
+function get_error($link)
+{
+    if (!empty(mysqli_error($link))) {
+        echo "Получена ошибка " . mysqli_error($link);
+        die();
+    }
 }

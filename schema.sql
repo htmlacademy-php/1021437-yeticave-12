@@ -32,7 +32,7 @@ CREATE TABLE `lots` (
     `ends_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'дата и время конца лота',
     `step_rate` DECIMAL(16,2) UNSIGNED NOT NULL COMMENT 'шаг ставки',
     `author_id` INT NOT NULL COMMENT 'id пользователя',
-    `user_winner_id` INT NOT NULL COMMENT 'id победителя',
+    `user_winner_id` INT COMMENT 'id победителя',
     `category_id` INT NOT NULL COMMENT 'id категории объявления'
 );
 

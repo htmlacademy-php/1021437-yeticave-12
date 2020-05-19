@@ -1,8 +1,8 @@
 <?php
 require_once "init.php";
 require_once "helpers.php";
-$current_category = get_escape_string($con, get_value("category", ""));
-if (isset($current_category) && $current_category !== "") {
+$current_category = get_escape_string($con, get_value("category"));
+if (!empty($current_category)) {
     list($count_lots, $page_count) = compute_pagination_offset_and_limit(
         $con,
         "SELECT 
@@ -19,25 +19,30 @@ if (isset($current_category) && $current_category !== "") {
         `name` 
     FROM `categories` 
     WHERE `code` = '".$current_category."'"));
+
+
     $sql_query_lots_category = "SELECT
-        lots.id, 
-        lots.image_link, 
-        lots.name, 
-        categories.name AS category, 
-        categories.code, 
-        lots.ends_at, 
-        (SELECT IF (MAX(bids.price) = NULL, MAX(bids.price), lots.price_start)  
-            FROM `bids` AS bids 
-            WHERE bids.lot_id = lots.id) AS price,
-        (SELECT COUNT(id) FROM `bids` AS bids WHERE bids.lot_id = lots.id) AS count_bets
-    FROM `lots` AS lots
-    JOIN `categories` AS categories
+      lots.id,
+      lots.image_link,
+      lots.name,
+      categories.name AS category,
+      categories.code,
+      lots.ends_at,
+      IFNULL(bids.price, lots.price_start) AS price,
+      IFNULL(bids.count_bets, 0) AS count_bets
+    FROM `lots`
+    JOIN `categories`
     ON lots.category_id = categories.id
-    WHERE lots.ends_at > NOW() 
-    AND categories.code = '" . $current_category . "' 
-    ORDER BY lots.created_at 
-    DESC LIMIT " . COUNT_ITEMS . " OFFSET " . $offset;
+    LEFT JOIN (SELECT MAX(price) AS price, count(id) AS count_bets, lot_id
+        FROM `bids`
+        GROUP BY lot_id) AS bids
+    ON bids.lot_id = lots.id
+    WHERE lots.ends_at > NOW()
+    AND categories.code = '" . $current_category . "'
+    ORDER BY lots.created_at DESC 
+    LIMIT " . COUNT_ITEMS . " OFFSET " . $offset;
     $lots_result = mysqli_query($con, $sql_query_lots_category);
+    get_error($con);
     $lots = mysqli_fetch_all($lots_result, MYSQLI_ASSOC);
     $page_content = include_template("lots.php", [
         "categories" => $categories,
@@ -61,7 +66,7 @@ if (isset($current_category) && $current_category !== "") {
 $layout_content = include_template("layout.php", [
     "main_content" => $page_content,
     "title_page" => "Страница лота",
-    "user_name" => session_user_value("name", ""),
+    "user_name" => get_value_from_user_session("name"),
     "categories" => $categories,
 ]);
 

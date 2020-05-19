@@ -20,7 +20,7 @@ if (!isset($_SESSION["user"])) {
     $lot_step = post_value("lot-step");
     $lot_date = post_value("lot-date");
     $lot_img = get_file("lot-img", "");
-    $author_id = session_user_value("id");
+    $author_id = get_value_from_user_session("id");
     $id_image = uniqid();
 
     $errors = validate(
@@ -73,7 +73,6 @@ if (!isset($_SESSION["user"])) {
         resize_and_watermark_image_of_lot($id_image . $lot_img["name"]);
         $file_url = PATH_UPLOADS_IMAGE . $id_image . $lot_img["name"];
         $query_insert_database_lot = "INSERT INTO `lots` (
-            `created_at`,
             `name`,
             `description`,
             `image_link`,
@@ -81,11 +80,10 @@ if (!isset($_SESSION["user"])) {
             `ends_at`,
             `step_rate`,
             `author_id`,
-            `user_winner_id`,
             `category_id`
         )
         VALUES(
-            NOW(), ?, ?, ?, ?, ?, ?, ?, 0, ?)";
+            ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = db_get_prepare_stmt($con, $query_insert_database_lot, [
             $lot_name,
             $message,
@@ -101,10 +99,9 @@ if (!isset($_SESSION["user"])) {
 
         if ($result) {
             $last_id = mysqli_insert_id($con);
-            header("Location: lot.php?id=" . $last_id);
-        } else {
-            echo "Ошибка вставки " . mysqli_error($con);
+            header("Location: lot.php?id=$last_id");
         }
+        echo "Ошибка вставки " . mysqli_error($con);
     } else {
         $page_content = include_template("add-lot.php", [
             "categories" => $categories,
@@ -122,7 +119,7 @@ if (!isset($_SESSION["user"])) {
 $layout_content = include_template("layout.php", [
     "main_content" => $page_content,
     "title_page" => "Добавление нового лота",
-    "user_name" => session_user_value("name", ""),
+    "user_name" => get_value_from_user_session("name"),
     "categories" => $categories,
     "css_calendar" => "<link href=\"css/flatpickr.min.css\" rel=\"stylesheet\">"
 ]);
